@@ -1,0 +1,81 @@
+export { Networks } from './networks.js';
+export { sha256, networkId, transactionHash, feeBumpTransactionHash } from './hash.js';
+export { Keypair } from './keypair.js';
+export {
+  parsePublicKey,
+  parseMuxedAccount,
+  nativeAsset,
+  creditAsset,
+  memoNone,
+  memoText,
+  memoId,
+  memoHash,
+  memoReturn,
+} from './helpers.js';
+export {
+  createAccount,
+  payment,
+  pathPaymentStrictReceive,
+  pathPaymentStrictSend,
+  manageSellOffer,
+  manageBuyOffer,
+  createPassiveSellOffer,
+  setOptions,
+  changeTrust,
+  allowTrust,
+  accountMerge,
+  inflation,
+  manageData,
+  bumpSequence,
+  createClaimableBalance,
+  claimClaimableBalance,
+  beginSponsoringFutureReserves,
+  endSponsoringFutureReserves,
+  revokeSponsorshipLedgerEntry,
+  revokeSponsorshipSigner,
+  clawback,
+  clawbackClaimableBalance,
+  setTrustLineFlags,
+  liquidityPoolDeposit,
+  liquidityPoolWithdraw,
+  invokeHostFunction,
+  extendFootprintTtl,
+  restoreFootprint,
+} from './operations.js';
+export type {
+  CreateAccountOptions,
+  PaymentOptions,
+  PathPaymentStrictReceiveOptions,
+  PathPaymentStrictSendOptions,
+  ManageSellOfferOptions,
+  ManageBuyOfferOptions,
+  CreatePassiveSellOfferOptions,
+  SetOptionsOptions,
+  ChangeTrustOptions,
+  AllowTrustOptions,
+  AccountMergeOptions,
+  ManageDataOptions,
+  BumpSequenceOptions,
+  CreateClaimableBalanceOptions,
+  ClaimClaimableBalanceOptions,
+  BeginSponsoringFutureReservesOptions,
+  RevokeSponsorshipLedgerEntryOptions,
+  RevokeSponsorshipSignerOptions,
+  ClawbackOptions,
+  ClawbackClaimableBalanceOptions,
+  SetTrustLineFlagsOptions,
+  LiquidityPoolDepositOptions,
+  LiquidityPoolWithdrawOptions,
+  InvokeHostFunctionOptions,
+  ExtendFootprintTtlOptions,
+} from './operations.js';
+export { TransactionBuilder, type AccountLike, type TransactionBuilderOptions } from './builder.js';
+export {
+  BuiltTransaction,
+  BuiltFeeBumpTransaction,
+  buildFeeBumpTransaction,
+  type BuildFeeBumpTransactionOptions,
+} from './transaction.js';
+
+// Re-export @stellar/xdr for convenience
+export * from '@stellar/xdr';

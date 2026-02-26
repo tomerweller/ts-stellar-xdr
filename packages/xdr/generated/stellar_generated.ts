@@ -217,7 +217,7 @@ export const ContractCostType = xdrEnum({
 });
 
 export type ExtensionPoint =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const ExtensionPoint: XdrCodec<ExtensionPoint> = taggedUnion({
@@ -319,23 +319,23 @@ export const ConfigSettingID = xdrEnum({
 });
 
 export type ConfigSettingEntry =
-  | { readonly tag: 'ContractMaxSizeBytes'; readonly value: Uint32 }
-  | { readonly tag: 'ContractComputeV0'; readonly value: ConfigSettingContractComputeV0 }
-  | { readonly tag: 'ContractLedgerCostV0'; readonly value: ConfigSettingContractLedgerCostV0 }
-  | { readonly tag: 'ContractHistoricalDataV0'; readonly value: ConfigSettingContractHistoricalDataV0 }
-  | { readonly tag: 'ContractEventsV0'; readonly value: ConfigSettingContractEventsV0 }
-  | { readonly tag: 'ContractBandwidthV0'; readonly value: ConfigSettingContractBandwidthV0 }
-  | { readonly tag: 'ContractCostParamsCpuInstructions'; readonly value: ContractCostParams }
-  | { readonly tag: 'ContractCostParamsMemoryBytes'; readonly value: ContractCostParams }
-  | { readonly tag: 'ContractDataKeySizeBytes'; readonly value: Uint32 }
-  | { readonly tag: 'ContractDataEntrySizeBytes'; readonly value: Uint32 }
-  | { readonly tag: 'StateArchival'; readonly value: StateArchivalSettings }
-  | { readonly tag: 'ContractExecutionLanes'; readonly value: ConfigSettingContractExecutionLanesV0 }
-  | { readonly tag: 'LiveSorobanStateSizeWindow'; readonly value: readonly Uint64[] }
-  | { readonly tag: 'EvictionIterator'; readonly value: EvictionIterator }
-  | { readonly tag: 'ContractParallelComputeV0'; readonly value: ConfigSettingContractParallelComputeV0 }
-  | { readonly tag: 'ContractLedgerCostExtV0'; readonly value: ConfigSettingContractLedgerCostExtV0 }
-  | { readonly tag: 'ScpTiming'; readonly value: ConfigSettingSCPTiming }
+  | { readonly ContractMaxSizeBytes: Uint32 }
+  | { readonly ContractComputeV0: ConfigSettingContractComputeV0 }
+  | { readonly ContractLedgerCostV0: ConfigSettingContractLedgerCostV0 }
+  | { readonly ContractHistoricalDataV0: ConfigSettingContractHistoricalDataV0 }
+  | { readonly ContractEventsV0: ConfigSettingContractEventsV0 }
+  | { readonly ContractBandwidthV0: ConfigSettingContractBandwidthV0 }
+  | { readonly ContractCostParamsCpuInstructions: ContractCostParams }
+  | { readonly ContractCostParamsMemoryBytes: ContractCostParams }
+  | { readonly ContractDataKeySizeBytes: Uint32 }
+  | { readonly ContractDataEntrySizeBytes: Uint32 }
+  | { readonly StateArchival: StateArchivalSettings }
+  | { readonly ContractExecutionLanes: ConfigSettingContractExecutionLanesV0 }
+  | { readonly LiveSorobanStateSizeWindow: readonly Uint64[] }
+  | { readonly EvictionIterator: EvictionIterator }
+  | { readonly ContractParallelComputeV0: ConfigSettingContractParallelComputeV0 }
+  | { readonly ContractLedgerCostExtV0: ConfigSettingContractLedgerCostExtV0 }
+  | { readonly ScpTiming: ConfigSettingSCPTiming }
 ;
 
 export const ConfigSettingEntry: XdrCodec<ConfigSettingEntry> = taggedUnion({
@@ -376,7 +376,7 @@ export const SCEnvMetaEntryInterfaceVersion: XdrCodec<SCEnvMetaEntryInterfaceVer
 ]);
 
 export type SCEnvMetaEntry =
-  | { readonly tag: 'ScEnvMetaKindInterfaceVersion'; readonly value: SCEnvMetaEntryInterfaceVersion }
+  | { readonly ScEnvMetaKindInterfaceVersion: SCEnvMetaEntryInterfaceVersion }
 ;
 
 export const SCEnvMetaEntry: XdrCodec<SCEnvMetaEntry> = taggedUnion({
@@ -401,7 +401,7 @@ export const SCMetaKind = xdrEnum({
 });
 
 export type SCMetaEntry =
-  | { readonly tag: 'ScMetaV0'; readonly value: SCMetaV0 }
+  | { readonly ScMetaV0: SCMetaV0 }
 ;
 
 export const SCMetaEntry: XdrCodec<SCMetaEntry> = taggedUnion({
@@ -490,32 +490,32 @@ export const SCSpecTypeUDT: XdrCodec<SCSpecTypeUDT> = xdrStruct<SCSpecTypeUDT>([
 ]);
 
 export type SCSpecTypeDef =
-  | { readonly tag: 'Val' }
-  | { readonly tag: 'Bool' }
-  | { readonly tag: 'Void' }
-  | { readonly tag: 'Error' }
-  | { readonly tag: 'U32' }
-  | { readonly tag: 'I32' }
-  | { readonly tag: 'U64' }
-  | { readonly tag: 'I64' }
-  | { readonly tag: 'Timepoint' }
-  | { readonly tag: 'Duration' }
-  | { readonly tag: 'U128' }
-  | { readonly tag: 'I128' }
-  | { readonly tag: 'U256' }
-  | { readonly tag: 'I256' }
-  | { readonly tag: 'Bytes' }
-  | { readonly tag: 'String' }
-  | { readonly tag: 'Symbol' }
-  | { readonly tag: 'Address' }
-  | { readonly tag: 'MuxedAddress' }
-  | { readonly tag: 'Option'; readonly value: SCSpecTypeOption }
-  | { readonly tag: 'Result'; readonly value: SCSpecTypeResult }
-  | { readonly tag: 'Vec'; readonly value: SCSpecTypeVec }
-  | { readonly tag: 'Map'; readonly value: SCSpecTypeMap }
-  | { readonly tag: 'Tuple'; readonly value: SCSpecTypeTuple }
-  | { readonly tag: 'BytesN'; readonly value: SCSpecTypeBytesN }
-  | { readonly tag: 'Udt'; readonly value: SCSpecTypeUDT }
+  | 'Val'
+  | 'Bool'
+  | 'Void'
+  | 'Error'
+  | 'U32'
+  | 'I32'
+  | 'U64'
+  | 'I64'
+  | 'Timepoint'
+  | 'Duration'
+  | 'U128'
+  | 'I128'
+  | 'U256'
+  | 'I256'
+  | 'Bytes'
+  | 'String'
+  | 'Symbol'
+  | 'Address'
+  | 'MuxedAddress'
+  | { readonly Option: SCSpecTypeOption }
+  | { readonly Result: SCSpecTypeResult }
+  | { readonly Vec: SCSpecTypeVec }
+  | { readonly Map: SCSpecTypeMap }
+  | { readonly Tuple: SCSpecTypeTuple }
+  | { readonly BytesN: SCSpecTypeBytesN }
+  | { readonly Udt: SCSpecTypeUDT }
 ;
 
 export const SCSpecTypeDef: XdrCodec<SCSpecTypeDef> = taggedUnion({
@@ -590,8 +590,8 @@ export const SCSpecUDTUnionCaseV0Kind = xdrEnum({
 });
 
 export type SCSpecUDTUnionCaseV0 =
-  | { readonly tag: 'VoidV0'; readonly value: SCSpecUDTUnionCaseVoidV0 }
-  | { readonly tag: 'TupleV0'; readonly value: SCSpecUDTUnionCaseTupleV0 }
+  | { readonly VoidV0: SCSpecUDTUnionCaseVoidV0 }
+  | { readonly TupleV0: SCSpecUDTUnionCaseTupleV0 }
 ;
 
 export const SCSpecUDTUnionCaseV0: XdrCodec<SCSpecUDTUnionCaseV0> = taggedUnion({
@@ -746,12 +746,12 @@ export const SCSpecEntryKind = xdrEnum({
 });
 
 export type SCSpecEntry =
-  | { readonly tag: 'FunctionV0'; readonly value: SCSpecFunctionV0 }
-  | { readonly tag: 'UdtStructV0'; readonly value: SCSpecUDTStructV0 }
-  | { readonly tag: 'UdtUnionV0'; readonly value: SCSpecUDTUnionV0 }
-  | { readonly tag: 'UdtEnumV0'; readonly value: SCSpecUDTEnumV0 }
-  | { readonly tag: 'UdtErrorEnumV0'; readonly value: SCSpecUDTErrorEnumV0 }
-  | { readonly tag: 'EventV0'; readonly value: SCSpecEventV0 }
+  | { readonly FunctionV0: SCSpecFunctionV0 }
+  | { readonly UdtStructV0: SCSpecUDTStructV0 }
+  | { readonly UdtUnionV0: SCSpecUDTUnionV0 }
+  | { readonly UdtEnumV0: SCSpecUDTEnumV0 }
+  | { readonly UdtErrorEnumV0: SCSpecUDTErrorEnumV0 }
+  | { readonly EventV0: SCSpecEventV0 }
 ;
 
 export const SCSpecEntry: XdrCodec<SCSpecEntry> = taggedUnion({
@@ -821,16 +821,16 @@ export const SCErrorCode = xdrEnum({
 });
 
 export type SCError =
-  | { readonly tag: 'Contract'; readonly value: Uint32 }
-  | { readonly tag: 'WasmVm'; readonly value: SCErrorCode }
-  | { readonly tag: 'Context'; readonly value: SCErrorCode }
-  | { readonly tag: 'Storage'; readonly value: SCErrorCode }
-  | { readonly tag: 'Object'; readonly value: SCErrorCode }
-  | { readonly tag: 'Crypto'; readonly value: SCErrorCode }
-  | { readonly tag: 'Events'; readonly value: SCErrorCode }
-  | { readonly tag: 'Budget'; readonly value: SCErrorCode }
-  | { readonly tag: 'Value'; readonly value: SCErrorCode }
-  | { readonly tag: 'Auth'; readonly value: SCErrorCode }
+  | { readonly Contract: Uint32 }
+  | { readonly WasmVm: SCErrorCode }
+  | { readonly Context: SCErrorCode }
+  | { readonly Storage: SCErrorCode }
+  | { readonly Object: SCErrorCode }
+  | { readonly Crypto: SCErrorCode }
+  | { readonly Events: SCErrorCode }
+  | { readonly Budget: SCErrorCode }
+  | { readonly Value: SCErrorCode }
+  | { readonly Auth: SCErrorCode }
 ;
 
 export const SCError: XdrCodec<SCError> = taggedUnion({
@@ -895,8 +895,8 @@ export type Hash = Uint8Array;
 export const Hash: XdrCodec<Hash> = fixedOpaque(32);
 
 export type ContractExecutable =
-  | { readonly tag: 'Wasm'; readonly value: Hash }
-  | { readonly tag: 'StellarAsset' }
+  | { readonly Wasm: Hash }
+  | 'StellarAsset'
 ;
 
 export const ContractExecutable: XdrCodec<ContractExecutable> = taggedUnion({
@@ -934,7 +934,7 @@ export const PublicKeyType = xdrEnum({
 });
 
 export type PublicKey =
-  | { readonly tag: 'PublicKeyTypeEd25519'; readonly value: Uint256 }
+  | { readonly PublicKeyTypeEd25519: Uint256 }
 ;
 
 export const PublicKey: XdrCodec<PublicKey> = taggedUnion({
@@ -956,7 +956,7 @@ export const ClaimableBalanceIDType = xdrEnum({
 });
 
 export type ClaimableBalanceID =
-  | { readonly tag: 'ClaimableBalanceIdTypeV0'; readonly value: Hash }
+  | { readonly ClaimableBalanceIdTypeV0: Hash }
 ;
 
 export const ClaimableBalanceID: XdrCodec<ClaimableBalanceID> = taggedUnion({
@@ -970,11 +970,11 @@ export type PoolID = Hash;
 export const PoolID: XdrCodec<PoolID> = Hash;
 
 export type SCAddress =
-  | { readonly tag: 'Account'; readonly value: AccountID }
-  | { readonly tag: 'Contract'; readonly value: ContractID }
-  | { readonly tag: 'MuxedAccount'; readonly value: MuxedEd25519Account }
-  | { readonly tag: 'ClaimableBalance'; readonly value: ClaimableBalanceID }
-  | { readonly tag: 'LiquidityPool'; readonly value: PoolID }
+  | { readonly Account: AccountID }
+  | { readonly Contract: ContractID }
+  | { readonly MuxedAccount: MuxedEd25519Account }
+  | { readonly ClaimableBalance: ClaimableBalanceID }
+  | { readonly LiquidityPool: PoolID }
 ;
 
 export const SCAddress: XdrCodec<SCAddress> = taggedUnion({
@@ -1017,7 +1017,7 @@ export const SCMap: XdrCodec<SCMap> = varArray(2147483647, SCMapEntry);
 
 export interface SCContractInstance {
   readonly executable: ContractExecutable;
-  readonly storage: SCMap | undefined;
+  readonly storage: SCMap | null;
 }
 export const SCContractInstance: XdrCodec<SCContractInstance> = xdrStruct<SCContractInstance>([
   ['executable', ContractExecutable],
@@ -1032,28 +1032,28 @@ export const SCNonceKey: XdrCodec<SCNonceKey> = xdrStruct<SCNonceKey>([
 ]);
 
 export type SCVal =
-  | { readonly tag: 'Bool'; readonly value: boolean }
-  | { readonly tag: 'Void' }
-  | { readonly tag: 'Error'; readonly value: SCError }
-  | { readonly tag: 'U32'; readonly value: Uint32 }
-  | { readonly tag: 'I32'; readonly value: Int32 }
-  | { readonly tag: 'U64'; readonly value: Uint64 }
-  | { readonly tag: 'I64'; readonly value: Int64 }
-  | { readonly tag: 'Timepoint'; readonly value: TimePoint }
-  | { readonly tag: 'Duration'; readonly value: Duration }
-  | { readonly tag: 'U128'; readonly value: UInt128Parts }
-  | { readonly tag: 'I128'; readonly value: Int128Parts }
-  | { readonly tag: 'U256'; readonly value: UInt256Parts }
-  | { readonly tag: 'I256'; readonly value: Int256Parts }
-  | { readonly tag: 'Bytes'; readonly value: SCBytes }
-  | { readonly tag: 'String'; readonly value: SCString }
-  | { readonly tag: 'Symbol'; readonly value: SCSymbol }
-  | { readonly tag: 'Vec'; readonly value: SCVec | undefined }
-  | { readonly tag: 'Map'; readonly value: SCMap | undefined }
-  | { readonly tag: 'Address'; readonly value: SCAddress }
-  | { readonly tag: 'ContractInstance'; readonly value: SCContractInstance }
-  | { readonly tag: 'LedgerKeyContractInstance' }
-  | { readonly tag: 'LedgerKeyNonce'; readonly value: SCNonceKey }
+  | { readonly Bool: boolean }
+  | 'Void'
+  | { readonly Error: SCError }
+  | { readonly U32: Uint32 }
+  | { readonly I32: Int32 }
+  | { readonly U64: Uint64 }
+  | { readonly I64: Int64 }
+  | { readonly Timepoint: TimePoint }
+  | { readonly Duration: Duration }
+  | { readonly U128: UInt128Parts }
+  | { readonly I128: Int128Parts }
+  | { readonly U256: UInt256Parts }
+  | { readonly I256: Int256Parts }
+  | { readonly Bytes: SCBytes }
+  | { readonly String: SCString }
+  | { readonly Symbol: SCSymbol }
+  | { readonly Vec: SCVec | null }
+  | { readonly Map: SCMap | null }
+  | { readonly Address: SCAddress }
+  | { readonly ContractInstance: SCContractInstance }
+  | 'LedgerKeyContractInstance'
+  | { readonly LedgerKeyNonce: SCNonceKey }
 ;
 
 export const SCVal: XdrCodec<SCVal> = taggedUnion({
@@ -1112,8 +1112,8 @@ export const LedgerCloseValueSignature: XdrCodec<LedgerCloseValueSignature> = xd
 ]);
 
 export type StellarValueExt =
-  | { readonly tag: 'Basic' }
-  | { readonly tag: 'Signed'; readonly value: LedgerCloseValueSignature }
+  | 'Basic'
+  | { readonly Signed: LedgerCloseValueSignature }
 ;
 
 export const StellarValueExt: XdrCodec<StellarValueExt> = taggedUnion({
@@ -1138,7 +1138,7 @@ export const StellarValue: XdrCodec<StellarValue> = xdrStruct<StellarValue>([
 ]);
 
 export type LedgerHeaderExtensionV1Ext =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const LedgerHeaderExtensionV1Ext: XdrCodec<LedgerHeaderExtensionV1Ext> = taggedUnion({
@@ -1158,8 +1158,8 @@ export const LedgerHeaderExtensionV1: XdrCodec<LedgerHeaderExtensionV1> = xdrStr
 ]);
 
 export type LedgerHeaderExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: LedgerHeaderExtensionV1 }
+  | '0'
+  | { readonly '1': LedgerHeaderExtensionV1 }
 ;
 
 export const LedgerHeaderExt: XdrCodec<LedgerHeaderExt> = taggedUnion({
@@ -1206,7 +1206,7 @@ export const LedgerHeader: XdrCodec<LedgerHeader> = xdrStruct<LedgerHeader>([
 ]);
 
 export type LedgerHeaderHistoryEntryExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const LedgerHeaderHistoryEntryExt: XdrCodec<LedgerHeaderHistoryEntryExt> = taggedUnion({
@@ -1263,11 +1263,11 @@ export const MemoType = xdrEnum({
 });
 
 export type Memo =
-  | { readonly tag: 'None' }
-  | { readonly tag: 'Text'; readonly value: string }
-  | { readonly tag: 'Id'; readonly value: Uint64 }
-  | { readonly tag: 'Hash'; readonly value: Hash }
-  | { readonly tag: 'Return'; readonly value: Hash }
+  | 'None'
+  | { readonly Text: string }
+  | { readonly Id: Uint64 }
+  | { readonly Hash: Hash }
+  | { readonly Return: Hash }
 ;
 
 export const Memo: XdrCodec<Memo> = taggedUnion({
@@ -1300,8 +1300,8 @@ export const MuxedAccountMed25519: XdrCodec<MuxedAccountMed25519> = xdrStruct<Mu
 ]);
 
 export type MuxedAccount =
-  | { readonly tag: 'Ed25519'; readonly value: Uint256 }
-  | { readonly tag: 'MuxedEd25519'; readonly value: MuxedAccountMed25519 }
+  | { readonly Ed25519: Uint256 }
+  | { readonly MuxedEd25519: MuxedAccountMed25519 }
 ;
 
 export const MuxedAccount: XdrCodec<MuxedAccount> = taggedUnion({
@@ -1385,9 +1385,9 @@ export const AlphaNum12: XdrCodec<AlphaNum12> = xdrStruct<AlphaNum12>([
 ]);
 
 export type Asset =
-  | { readonly tag: 'Native' }
-  | { readonly tag: 'CreditAlphanum4'; readonly value: AlphaNum4 }
-  | { readonly tag: 'CreditAlphanum12'; readonly value: AlphaNum12 }
+  | 'Native'
+  | { readonly CreditAlphanum4: AlphaNum4 }
+  | { readonly CreditAlphanum12: AlphaNum12 }
 ;
 
 export const Asset: XdrCodec<Asset> = taggedUnion({
@@ -1485,10 +1485,10 @@ export const SignerKeyEd25519SignedPayload: XdrCodec<SignerKeyEd25519SignedPaylo
 ]);
 
 export type SignerKey =
-  | { readonly tag: 'Ed25519'; readonly value: Uint256 }
-  | { readonly tag: 'PreAuthTx'; readonly value: Uint256 }
-  | { readonly tag: 'HashX'; readonly value: Uint256 }
-  | { readonly tag: 'Ed25519SignedPayload'; readonly value: SignerKeyEd25519SignedPayload }
+  | { readonly Ed25519: Uint256 }
+  | { readonly PreAuthTx: Uint256 }
+  | { readonly HashX: Uint256 }
+  | { readonly Ed25519SignedPayload: SignerKeyEd25519SignedPayload }
 ;
 
 export const SignerKey: XdrCodec<SignerKey> = taggedUnion({
@@ -1511,15 +1511,15 @@ export const Signer: XdrCodec<Signer> = xdrStruct<Signer>([
 ]);
 
 export interface SetOptionsOp {
-  readonly inflationDest: AccountID | undefined;
-  readonly clearFlags: Uint32 | undefined;
-  readonly setFlags: Uint32 | undefined;
-  readonly masterWeight: Uint32 | undefined;
-  readonly lowThreshold: Uint32 | undefined;
-  readonly medThreshold: Uint32 | undefined;
-  readonly highThreshold: Uint32 | undefined;
-  readonly homeDomain: String32 | undefined;
-  readonly signer: Signer | undefined;
+  readonly inflationDest: AccountID | null;
+  readonly clearFlags: Uint32 | null;
+  readonly setFlags: Uint32 | null;
+  readonly masterWeight: Uint32 | null;
+  readonly lowThreshold: Uint32 | null;
+  readonly medThreshold: Uint32 | null;
+  readonly highThreshold: Uint32 | null;
+  readonly homeDomain: String32 | null;
+  readonly signer: Signer | null;
 }
 export const SetOptionsOp: XdrCodec<SetOptionsOp> = xdrStruct<SetOptionsOp>([
   ['inflationDest', option(AccountID)],
@@ -1550,7 +1550,7 @@ export const LiquidityPoolConstantProductParameters: XdrCodec<LiquidityPoolConst
 ]);
 
 export type LiquidityPoolParameters =
-  | { readonly tag: 'LiquidityPoolConstantProduct'; readonly value: LiquidityPoolConstantProductParameters }
+  | { readonly LiquidityPoolConstantProduct: LiquidityPoolConstantProductParameters }
 ;
 
 export const LiquidityPoolParameters: XdrCodec<LiquidityPoolParameters> = taggedUnion({
@@ -1561,10 +1561,10 @@ export const LiquidityPoolParameters: XdrCodec<LiquidityPoolParameters> = tagged
 }) as XdrCodec<LiquidityPoolParameters>;
 
 export type ChangeTrustAsset =
-  | { readonly tag: 'Native' }
-  | { readonly tag: 'CreditAlphanum4'; readonly value: AlphaNum4 }
-  | { readonly tag: 'CreditAlphanum12'; readonly value: AlphaNum12 }
-  | { readonly tag: 'PoolShare'; readonly value: LiquidityPoolParameters }
+  | 'Native'
+  | { readonly CreditAlphanum4: AlphaNum4 }
+  | { readonly CreditAlphanum12: AlphaNum12 }
+  | { readonly PoolShare: LiquidityPoolParameters }
 ;
 
 export const ChangeTrustAsset: XdrCodec<ChangeTrustAsset> = taggedUnion({
@@ -1587,8 +1587,8 @@ export const ChangeTrustOp: XdrCodec<ChangeTrustOp> = xdrStruct<ChangeTrustOp>([
 ]);
 
 export type AssetCode =
-  | { readonly tag: 'CreditAlphanum4'; readonly value: AssetCode4 }
-  | { readonly tag: 'CreditAlphanum12'; readonly value: AssetCode12 }
+  | { readonly CreditAlphanum4: AssetCode4 }
+  | { readonly CreditAlphanum12: AssetCode12 }
 ;
 
 export const AssetCode: XdrCodec<AssetCode> = taggedUnion({
@@ -1618,7 +1618,7 @@ export const DataValue: XdrCodec<DataValue> = varOpaque(64);
 
 export interface ManageDataOp {
   readonly dataName: String64;
-  readonly dataValue: DataValue | undefined;
+  readonly dataValue: DataValue | null;
 }
 export const ManageDataOp: XdrCodec<ManageDataOp> = xdrStruct<ManageDataOp>([
   ['dataName', String64],
@@ -1680,12 +1680,12 @@ export const ClaimPredicateType = xdrEnum({
 });
 
 export type ClaimPredicate =
-  | { readonly tag: 'Unconditional' }
-  | { readonly tag: 'And'; readonly value: readonly ClaimPredicate[] }
-  | { readonly tag: 'Or'; readonly value: readonly ClaimPredicate[] }
-  | { readonly tag: 'Not'; readonly value: ClaimPredicate | undefined }
-  | { readonly tag: 'BeforeAbsoluteTime'; readonly value: Int64 }
-  | { readonly tag: 'BeforeRelativeTime'; readonly value: Int64 }
+  | 'Unconditional'
+  | { readonly And: readonly ClaimPredicate[] }
+  | { readonly Or: readonly ClaimPredicate[] }
+  | { readonly Not: ClaimPredicate | null }
+  | { readonly BeforeAbsoluteTime: Int64 }
+  | { readonly BeforeRelativeTime: Int64 }
 ;
 
 export const ClaimPredicate: XdrCodec<ClaimPredicate> = taggedUnion({
@@ -1710,7 +1710,7 @@ export const ClaimantV0: XdrCodec<ClaimantV0> = xdrStruct<ClaimantV0>([
 ]);
 
 export type Claimant =
-  | { readonly tag: 'ClaimantTypeV0'; readonly value: ClaimantV0 }
+  | { readonly ClaimantTypeV0: ClaimantV0 }
 ;
 
 export const Claimant: XdrCodec<Claimant> = taggedUnion({
@@ -1773,10 +1773,10 @@ export const LedgerKeyAccount: XdrCodec<LedgerKeyAccount> = xdrStruct<LedgerKeyA
 ]);
 
 export type TrustLineAsset =
-  | { readonly tag: 'Native' }
-  | { readonly tag: 'CreditAlphanum4'; readonly value: AlphaNum4 }
-  | { readonly tag: 'CreditAlphanum12'; readonly value: AlphaNum12 }
-  | { readonly tag: 'PoolShare'; readonly value: PoolID }
+  | 'Native'
+  | { readonly CreditAlphanum4: AlphaNum4 }
+  | { readonly CreditAlphanum12: AlphaNum12 }
+  | { readonly PoolShare: PoolID }
 ;
 
 export const TrustLineAsset: XdrCodec<TrustLineAsset> = taggedUnion({
@@ -1869,16 +1869,16 @@ export const LedgerKeyTtl: XdrCodec<LedgerKeyTtl> = xdrStruct<LedgerKeyTtl>([
 ]);
 
 export type LedgerKey =
-  | { readonly tag: 'Account'; readonly value: LedgerKeyAccount }
-  | { readonly tag: 'Trustline'; readonly value: LedgerKeyTrustLine }
-  | { readonly tag: 'Offer'; readonly value: LedgerKeyOffer }
-  | { readonly tag: 'Data'; readonly value: LedgerKeyData }
-  | { readonly tag: 'ClaimableBalance'; readonly value: LedgerKeyClaimableBalance }
-  | { readonly tag: 'LiquidityPool'; readonly value: LedgerKeyLiquidityPool }
-  | { readonly tag: 'ContractData'; readonly value: LedgerKeyContractData }
-  | { readonly tag: 'ContractCode'; readonly value: LedgerKeyContractCode }
-  | { readonly tag: 'ConfigSetting'; readonly value: LedgerKeyConfigSetting }
-  | { readonly tag: 'Ttl'; readonly value: LedgerKeyTtl }
+  | { readonly Account: LedgerKeyAccount }
+  | { readonly Trustline: LedgerKeyTrustLine }
+  | { readonly Offer: LedgerKeyOffer }
+  | { readonly Data: LedgerKeyData }
+  | { readonly ClaimableBalance: LedgerKeyClaimableBalance }
+  | { readonly LiquidityPool: LedgerKeyLiquidityPool }
+  | { readonly ContractData: LedgerKeyContractData }
+  | { readonly ContractCode: LedgerKeyContractCode }
+  | { readonly ConfigSetting: LedgerKeyConfigSetting }
+  | { readonly Ttl: LedgerKeyTtl }
 ;
 
 export const LedgerKey: XdrCodec<LedgerKey> = taggedUnion({
@@ -1907,8 +1907,8 @@ export const RevokeSponsorshipOpSigner: XdrCodec<RevokeSponsorshipOpSigner> = xd
 ]);
 
 export type RevokeSponsorshipOp =
-  | { readonly tag: 'LedgerEntry'; readonly value: LedgerKey }
-  | { readonly tag: 'Signer'; readonly value: RevokeSponsorshipOpSigner }
+  | { readonly LedgerEntry: LedgerKey }
+  | { readonly Signer: RevokeSponsorshipOpSigner }
 ;
 
 export const RevokeSponsorshipOp: XdrCodec<RevokeSponsorshipOp> = taggedUnion({
@@ -2013,8 +2013,8 @@ export const ContractIDPreimageFromAddress: XdrCodec<ContractIDPreimageFromAddre
 ]);
 
 export type ContractIDPreimage =
-  | { readonly tag: 'Address'; readonly value: ContractIDPreimageFromAddress }
-  | { readonly tag: 'Asset'; readonly value: Asset }
+  | { readonly Address: ContractIDPreimageFromAddress }
+  | { readonly Asset: Asset }
 ;
 
 export const ContractIDPreimage: XdrCodec<ContractIDPreimage> = taggedUnion({
@@ -2046,10 +2046,10 @@ export const CreateContractArgsV2: XdrCodec<CreateContractArgsV2> = xdrStruct<Cr
 ]);
 
 export type HostFunction =
-  | { readonly tag: 'InvokeContract'; readonly value: InvokeContractArgs }
-  | { readonly tag: 'CreateContract'; readonly value: CreateContractArgs }
-  | { readonly tag: 'UploadContractWasm'; readonly value: Uint8Array }
-  | { readonly tag: 'CreateContractV2'; readonly value: CreateContractArgsV2 }
+  | { readonly InvokeContract: InvokeContractArgs }
+  | { readonly CreateContract: CreateContractArgs }
+  | { readonly UploadContractWasm: Uint8Array }
+  | { readonly CreateContractV2: CreateContractArgsV2 }
 ;
 
 export const HostFunction: XdrCodec<HostFunction> = taggedUnion({
@@ -2082,8 +2082,8 @@ export const SorobanAddressCredentials: XdrCodec<SorobanAddressCredentials> = xd
 ]);
 
 export type SorobanCredentials =
-  | { readonly tag: 'SourceAccount' }
-  | { readonly tag: 'Address'; readonly value: SorobanAddressCredentials }
+  | 'SourceAccount'
+  | { readonly Address: SorobanAddressCredentials }
 ;
 
 export const SorobanCredentials: XdrCodec<SorobanCredentials> = taggedUnion({
@@ -2102,9 +2102,9 @@ export const SorobanAuthorizedFunctionType = xdrEnum({
 });
 
 export type SorobanAuthorizedFunction =
-  | { readonly tag: 'ContractFn'; readonly value: InvokeContractArgs }
-  | { readonly tag: 'CreateContractHostFn'; readonly value: CreateContractArgs }
-  | { readonly tag: 'CreateContractV2HostFn'; readonly value: CreateContractArgsV2 }
+  | { readonly ContractFn: InvokeContractArgs }
+  | { readonly CreateContractHostFn: CreateContractArgs }
+  | { readonly CreateContractV2HostFn: CreateContractArgsV2 }
 ;
 
 export const SorobanAuthorizedFunction: XdrCodec<SorobanAuthorizedFunction> = taggedUnion({
@@ -2160,33 +2160,33 @@ export const RestoreFootprintOp: XdrCodec<RestoreFootprintOp> = xdrStruct<Restor
 ]);
 
 export type OperationBody =
-  | { readonly tag: 'CreateAccount'; readonly value: CreateAccountOp }
-  | { readonly tag: 'Payment'; readonly value: PaymentOp }
-  | { readonly tag: 'PathPaymentStrictReceive'; readonly value: PathPaymentStrictReceiveOp }
-  | { readonly tag: 'ManageSellOffer'; readonly value: ManageSellOfferOp }
-  | { readonly tag: 'CreatePassiveSellOffer'; readonly value: CreatePassiveSellOfferOp }
-  | { readonly tag: 'SetOptions'; readonly value: SetOptionsOp }
-  | { readonly tag: 'ChangeTrust'; readonly value: ChangeTrustOp }
-  | { readonly tag: 'AllowTrust'; readonly value: AllowTrustOp }
-  | { readonly tag: 'AccountMerge'; readonly value: MuxedAccount }
-  | { readonly tag: 'Inflation' }
-  | { readonly tag: 'ManageData'; readonly value: ManageDataOp }
-  | { readonly tag: 'BumpSequence'; readonly value: BumpSequenceOp }
-  | { readonly tag: 'ManageBuyOffer'; readonly value: ManageBuyOfferOp }
-  | { readonly tag: 'PathPaymentStrictSend'; readonly value: PathPaymentStrictSendOp }
-  | { readonly tag: 'CreateClaimableBalance'; readonly value: CreateClaimableBalanceOp }
-  | { readonly tag: 'ClaimClaimableBalance'; readonly value: ClaimClaimableBalanceOp }
-  | { readonly tag: 'BeginSponsoringFutureReserves'; readonly value: BeginSponsoringFutureReservesOp }
-  | { readonly tag: 'EndSponsoringFutureReserves' }
-  | { readonly tag: 'RevokeSponsorship'; readonly value: RevokeSponsorshipOp }
-  | { readonly tag: 'Clawback'; readonly value: ClawbackOp }
-  | { readonly tag: 'ClawbackClaimableBalance'; readonly value: ClawbackClaimableBalanceOp }
-  | { readonly tag: 'SetTrustLineFlags'; readonly value: SetTrustLineFlagsOp }
-  | { readonly tag: 'LiquidityPoolDeposit'; readonly value: LiquidityPoolDepositOp }
-  | { readonly tag: 'LiquidityPoolWithdraw'; readonly value: LiquidityPoolWithdrawOp }
-  | { readonly tag: 'InvokeHostFunction'; readonly value: InvokeHostFunctionOp }
-  | { readonly tag: 'ExtendFootprintTtl'; readonly value: ExtendFootprintTTLOp }
-  | { readonly tag: 'RestoreFootprint'; readonly value: RestoreFootprintOp }
+  | { readonly CreateAccount: CreateAccountOp }
+  | { readonly Payment: PaymentOp }
+  | { readonly PathPaymentStrictReceive: PathPaymentStrictReceiveOp }
+  | { readonly ManageSellOffer: ManageSellOfferOp }
+  | { readonly CreatePassiveSellOffer: CreatePassiveSellOfferOp }
+  | { readonly SetOptions: SetOptionsOp }
+  | { readonly ChangeTrust: ChangeTrustOp }
+  | { readonly AllowTrust: AllowTrustOp }
+  | { readonly AccountMerge: MuxedAccount }
+  | 'Inflation'
+  | { readonly ManageData: ManageDataOp }
+  | { readonly BumpSequence: BumpSequenceOp }
+  | { readonly ManageBuyOffer: ManageBuyOfferOp }
+  | { readonly PathPaymentStrictSend: PathPaymentStrictSendOp }
+  | { readonly CreateClaimableBalance: CreateClaimableBalanceOp }
+  | { readonly ClaimClaimableBalance: ClaimClaimableBalanceOp }
+  | { readonly BeginSponsoringFutureReserves: BeginSponsoringFutureReservesOp }
+  | 'EndSponsoringFutureReserves'
+  | { readonly RevokeSponsorship: RevokeSponsorshipOp }
+  | { readonly Clawback: ClawbackOp }
+  | { readonly ClawbackClaimableBalance: ClawbackClaimableBalanceOp }
+  | { readonly SetTrustLineFlags: SetTrustLineFlagsOp }
+  | { readonly LiquidityPoolDeposit: LiquidityPoolDepositOp }
+  | { readonly LiquidityPoolWithdraw: LiquidityPoolWithdrawOp }
+  | { readonly InvokeHostFunction: InvokeHostFunctionOp }
+  | { readonly ExtendFootprintTtl: ExtendFootprintTTLOp }
+  | { readonly RestoreFootprint: RestoreFootprintOp }
 ;
 
 export const OperationBody: XdrCodec<OperationBody> = taggedUnion({
@@ -2223,7 +2223,7 @@ export const OperationBody: XdrCodec<OperationBody> = taggedUnion({
 }) as XdrCodec<OperationBody>;
 
 export interface Operation {
-  readonly sourceAccount: MuxedAccount | undefined;
+  readonly sourceAccount: MuxedAccount | null;
   readonly body: OperationBody;
 }
 export const Operation: XdrCodec<Operation> = xdrStruct<Operation>([
@@ -2234,7 +2234,7 @@ export const Operation: XdrCodec<Operation> = xdrStruct<Operation>([
 export const MAX_OPS_PER_TX = 100;
 
 export type TransactionV0Ext =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const TransactionV0Ext: XdrCodec<TransactionV0Ext> = taggedUnion({
@@ -2248,7 +2248,7 @@ export interface TransactionV0 {
   readonly sourceAccountEd25519: Uint256;
   readonly fee: Uint32;
   readonly seqNum: SequenceNumber;
-  readonly timeBounds: TimeBounds | undefined;
+  readonly timeBounds: TimeBounds | null;
   readonly memo: Memo;
   readonly operations: readonly Operation[];
   readonly ext: TransactionV0Ext;
@@ -2301,9 +2301,9 @@ export const LedgerBounds: XdrCodec<LedgerBounds> = xdrStruct<LedgerBounds>([
 ]);
 
 export interface PreconditionsV2 {
-  readonly timeBounds: TimeBounds | undefined;
-  readonly ledgerBounds: LedgerBounds | undefined;
-  readonly minSeqNum: SequenceNumber | undefined;
+  readonly timeBounds: TimeBounds | null;
+  readonly ledgerBounds: LedgerBounds | null;
+  readonly minSeqNum: SequenceNumber | null;
   readonly minSeqAge: Duration;
   readonly minSeqLedgerGap: Uint32;
   readonly extraSigners: readonly SignerKey[];
@@ -2318,9 +2318,9 @@ export const PreconditionsV2: XdrCodec<PreconditionsV2> = xdrStruct<Precondition
 ]);
 
 export type Preconditions =
-  | { readonly tag: 'None' }
-  | { readonly tag: 'Time'; readonly value: TimeBounds }
-  | { readonly tag: 'V2'; readonly value: PreconditionsV2 }
+  | 'None'
+  | { readonly Time: TimeBounds }
+  | { readonly V2: PreconditionsV2 }
 ;
 
 export const Preconditions: XdrCodec<Preconditions> = taggedUnion({
@@ -2340,8 +2340,8 @@ export const SorobanResourcesExtV0: XdrCodec<SorobanResourcesExtV0> = xdrStruct<
 ]);
 
 export type SorobanTransactionDataExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: SorobanResourcesExtV0 }
+  | '0'
+  | { readonly '1': SorobanResourcesExtV0 }
 ;
 
 export const SorobanTransactionDataExt: XdrCodec<SorobanTransactionDataExt> = taggedUnion({
@@ -2386,8 +2386,8 @@ export const SorobanTransactionData: XdrCodec<SorobanTransactionData> = xdrStruc
 ]);
 
 export type TransactionExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: SorobanTransactionData }
+  | '0'
+  | { readonly '1': SorobanTransactionData }
 ;
 
 export const TransactionExt: XdrCodec<TransactionExt> = taggedUnion({
@@ -2427,7 +2427,7 @@ export const TransactionV1Envelope: XdrCodec<TransactionV1Envelope> = xdrStruct<
 ]);
 
 export type FeeBumpTransactionInnerTx =
-  | { readonly tag: 'Tx'; readonly value: TransactionV1Envelope }
+  | { readonly Tx: TransactionV1Envelope }
 ;
 
 export const FeeBumpTransactionInnerTx: XdrCodec<FeeBumpTransactionInnerTx> = taggedUnion({
@@ -2438,7 +2438,7 @@ export const FeeBumpTransactionInnerTx: XdrCodec<FeeBumpTransactionInnerTx> = ta
 }) as XdrCodec<FeeBumpTransactionInnerTx>;
 
 export type FeeBumpTransactionExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const FeeBumpTransactionExt: XdrCodec<FeeBumpTransactionExt> = taggedUnion({
@@ -2471,9 +2471,9 @@ export const FeeBumpTransactionEnvelope: XdrCodec<FeeBumpTransactionEnvelope> = 
 ]);
 
 export type TransactionEnvelope =
-  | { readonly tag: 'TxV0'; readonly value: TransactionV0Envelope }
-  | { readonly tag: 'Tx'; readonly value: TransactionV1Envelope }
-  | { readonly tag: 'TxFeeBump'; readonly value: FeeBumpTransactionEnvelope }
+  | { readonly TxV0: TransactionV0Envelope }
+  | { readonly Tx: TransactionV1Envelope }
+  | { readonly TxFeeBump: FeeBumpTransactionEnvelope }
 ;
 
 export const TransactionEnvelope: XdrCodec<TransactionEnvelope> = taggedUnion({
@@ -2538,11 +2538,11 @@ export const CreateAccountResultCode = xdrEnum({
 });
 
 export type CreateAccountResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'LowReserve' }
-  | { readonly tag: 'AlreadyExist' }
+  | 'Success'
+  | 'Malformed'
+  | 'Underfunded'
+  | 'LowReserve'
+  | 'AlreadyExist'
 ;
 
 export const CreateAccountResult: XdrCodec<CreateAccountResult> = taggedUnion({
@@ -2568,16 +2568,16 @@ export const PaymentResultCode = xdrEnum({
 });
 
 export type PaymentResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'SrcNoTrust' }
-  | { readonly tag: 'SrcNotAuthorized' }
-  | { readonly tag: 'NoDestination' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'NotAuthorized' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'NoIssuer' }
+  | 'Success'
+  | 'Malformed'
+  | 'Underfunded'
+  | 'SrcNoTrust'
+  | 'SrcNotAuthorized'
+  | 'NoDestination'
+  | 'NoTrust'
+  | 'NotAuthorized'
+  | 'LineFull'
+  | 'NoIssuer'
 ;
 
 export const PaymentResult: XdrCodec<PaymentResult> = taggedUnion({
@@ -2662,9 +2662,9 @@ export const ClaimLiquidityAtom: XdrCodec<ClaimLiquidityAtom> = xdrStruct<ClaimL
 ]);
 
 export type ClaimAtom =
-  | { readonly tag: 'V0'; readonly value: ClaimOfferAtomV0 }
-  | { readonly tag: 'OrderBook'; readonly value: ClaimOfferAtom }
-  | { readonly tag: 'LiquidityPool'; readonly value: ClaimLiquidityAtom }
+  | { readonly V0: ClaimOfferAtomV0 }
+  | { readonly OrderBook: ClaimOfferAtom }
+  | { readonly LiquidityPool: ClaimLiquidityAtom }
 ;
 
 export const ClaimAtom: XdrCodec<ClaimAtom> = taggedUnion({
@@ -2697,19 +2697,19 @@ export const PathPaymentStrictReceiveResultSuccess: XdrCodec<PathPaymentStrictRe
 ]);
 
 export type PathPaymentStrictReceiveResult =
-  | { readonly tag: 'Success'; readonly value: PathPaymentStrictReceiveResultSuccess }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'SrcNoTrust' }
-  | { readonly tag: 'SrcNotAuthorized' }
-  | { readonly tag: 'NoDestination' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'NotAuthorized' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'NoIssuer'; readonly value: Asset }
-  | { readonly tag: 'TooFewOffers' }
-  | { readonly tag: 'OfferCrossSelf' }
-  | { readonly tag: 'OverSendmax' }
+  | { readonly Success: PathPaymentStrictReceiveResultSuccess }
+  | 'Malformed'
+  | 'Underfunded'
+  | 'SrcNoTrust'
+  | 'SrcNotAuthorized'
+  | 'NoDestination'
+  | 'NoTrust'
+  | 'NotAuthorized'
+  | 'LineFull'
+  | { readonly NoIssuer: Asset }
+  | 'TooFewOffers'
+  | 'OfferCrossSelf'
+  | 'OverSendmax'
 ;
 
 export const PathPaymentStrictReceiveResult: XdrCodec<PathPaymentStrictReceiveResult> = taggedUnion({
@@ -2747,7 +2747,7 @@ export const ManageOfferEffect = xdrEnum({
 });
 
 export type OfferEntryExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const OfferEntryExt: XdrCodec<OfferEntryExt> = taggedUnion({
@@ -2779,9 +2779,9 @@ export const OfferEntry: XdrCodec<OfferEntry> = xdrStruct<OfferEntry>([
 ]);
 
 export type ManageOfferSuccessResultOffer =
-  | { readonly tag: 'Created'; readonly value: OfferEntry }
-  | { readonly tag: 'Updated'; readonly value: OfferEntry }
-  | { readonly tag: 'Deleted' }
+  | { readonly Created: OfferEntry }
+  | { readonly Updated: OfferEntry }
+  | 'Deleted'
 ;
 
 export const ManageOfferSuccessResultOffer: XdrCodec<ManageOfferSuccessResultOffer> = taggedUnion({
@@ -2802,19 +2802,19 @@ export const ManageOfferSuccessResult: XdrCodec<ManageOfferSuccessResult> = xdrS
 ]);
 
 export type ManageSellOfferResult =
-  | { readonly tag: 'Success'; readonly value: ManageOfferSuccessResult }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'SellNoTrust' }
-  | { readonly tag: 'BuyNoTrust' }
-  | { readonly tag: 'SellNotAuthorized' }
-  | { readonly tag: 'BuyNotAuthorized' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'CrossSelf' }
-  | { readonly tag: 'SellNoIssuer' }
-  | { readonly tag: 'BuyNoIssuer' }
-  | { readonly tag: 'NotFound' }
-  | { readonly tag: 'LowReserve' }
+  | { readonly Success: ManageOfferSuccessResult }
+  | 'Malformed'
+  | 'SellNoTrust'
+  | 'BuyNoTrust'
+  | 'SellNotAuthorized'
+  | 'BuyNotAuthorized'
+  | 'LineFull'
+  | 'Underfunded'
+  | 'CrossSelf'
+  | 'SellNoIssuer'
+  | 'BuyNoIssuer'
+  | 'NotFound'
+  | 'LowReserve'
 ;
 
 export const ManageSellOfferResult: XdrCodec<ManageSellOfferResult> = taggedUnion({
@@ -2841,17 +2841,17 @@ export const SetOptionsResultCode = xdrEnum({
 });
 
 export type SetOptionsResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'LowReserve' }
-  | { readonly tag: 'TooManySigners' }
-  | { readonly tag: 'BadFlags' }
-  | { readonly tag: 'InvalidInflation' }
-  | { readonly tag: 'CantChange' }
-  | { readonly tag: 'UnknownFlag' }
-  | { readonly tag: 'ThresholdOutOfRange' }
-  | { readonly tag: 'BadSigner' }
-  | { readonly tag: 'InvalidHomeDomain' }
-  | { readonly tag: 'AuthRevocableRequired' }
+  | 'Success'
+  | 'LowReserve'
+  | 'TooManySigners'
+  | 'BadFlags'
+  | 'InvalidInflation'
+  | 'CantChange'
+  | 'UnknownFlag'
+  | 'ThresholdOutOfRange'
+  | 'BadSigner'
+  | 'InvalidHomeDomain'
+  | 'AuthRevocableRequired'
 ;
 
 export const SetOptionsResult: XdrCodec<SetOptionsResult> = taggedUnion({
@@ -2876,15 +2876,15 @@ export const ChangeTrustResultCode = xdrEnum({
 });
 
 export type ChangeTrustResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NoIssuer' }
-  | { readonly tag: 'InvalidLimit' }
-  | { readonly tag: 'LowReserve' }
-  | { readonly tag: 'SelfNotAllowed' }
-  | { readonly tag: 'TrustLineMissing' }
-  | { readonly tag: 'CannotDelete' }
-  | { readonly tag: 'NotAuthMaintainLiabilities' }
+  | 'Success'
+  | 'Malformed'
+  | 'NoIssuer'
+  | 'InvalidLimit'
+  | 'LowReserve'
+  | 'SelfNotAllowed'
+  | 'TrustLineMissing'
+  | 'CannotDelete'
+  | 'NotAuthMaintainLiabilities'
 ;
 
 export const ChangeTrustResult: XdrCodec<ChangeTrustResult> = taggedUnion({
@@ -2907,13 +2907,13 @@ export const AllowTrustResultCode = xdrEnum({
 });
 
 export type AllowTrustResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NoTrustLine' }
-  | { readonly tag: 'TrustNotRequired' }
-  | { readonly tag: 'CantRevoke' }
-  | { readonly tag: 'SelfNotAllowed' }
-  | { readonly tag: 'LowReserve' }
+  | 'Success'
+  | 'Malformed'
+  | 'NoTrustLine'
+  | 'TrustNotRequired'
+  | 'CantRevoke'
+  | 'SelfNotAllowed'
+  | 'LowReserve'
 ;
 
 export const AllowTrustResult: XdrCodec<AllowTrustResult> = taggedUnion({
@@ -2937,14 +2937,14 @@ export const AccountMergeResultCode = xdrEnum({
 });
 
 export type AccountMergeResult =
-  | { readonly tag: 'Success'; readonly value: Int64 }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NoAccount' }
-  | { readonly tag: 'ImmutableSet' }
-  | { readonly tag: 'HasSubEntries' }
-  | { readonly tag: 'SeqnumTooFar' }
-  | { readonly tag: 'DestFull' }
-  | { readonly tag: 'IsSponsor' }
+  | { readonly Success: Int64 }
+  | 'Malformed'
+  | 'NoAccount'
+  | 'ImmutableSet'
+  | 'HasSubEntries'
+  | 'SeqnumTooFar'
+  | 'DestFull'
+  | 'IsSponsor'
 ;
 
 export const AccountMergeResult: XdrCodec<AccountMergeResult> = taggedUnion({
@@ -2971,8 +2971,8 @@ export const InflationPayout: XdrCodec<InflationPayout> = xdrStruct<InflationPay
 ]);
 
 export type InflationResult =
-  | { readonly tag: 'Success'; readonly value: readonly InflationPayout[] }
-  | { readonly tag: 'NotTime' }
+  | { readonly Success: readonly InflationPayout[] }
+  | 'NotTime'
 ;
 
 export const InflationResult: XdrCodec<InflationResult> = taggedUnion({
@@ -2993,11 +2993,11 @@ export const ManageDataResultCode = xdrEnum({
 });
 
 export type ManageDataResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'NotSupportedYet' }
-  | { readonly tag: 'NameNotFound' }
-  | { readonly tag: 'LowReserve' }
-  | { readonly tag: 'InvalidName' }
+  | 'Success'
+  | 'NotSupportedYet'
+  | 'NameNotFound'
+  | 'LowReserve'
+  | 'InvalidName'
 ;
 
 export const ManageDataResult: XdrCodec<ManageDataResult> = taggedUnion({
@@ -3015,8 +3015,8 @@ export const BumpSequenceResultCode = xdrEnum({
 });
 
 export type BumpSequenceResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'BadSeq' }
+  | 'Success'
+  | 'BadSeq'
 ;
 
 export const BumpSequenceResult: XdrCodec<BumpSequenceResult> = taggedUnion({
@@ -3045,19 +3045,19 @@ export const ManageBuyOfferResultCode = xdrEnum({
 });
 
 export type ManageBuyOfferResult =
-  | { readonly tag: 'Success'; readonly value: ManageOfferSuccessResult }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'SellNoTrust' }
-  | { readonly tag: 'BuyNoTrust' }
-  | { readonly tag: 'SellNotAuthorized' }
-  | { readonly tag: 'BuyNotAuthorized' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'CrossSelf' }
-  | { readonly tag: 'SellNoIssuer' }
-  | { readonly tag: 'BuyNoIssuer' }
-  | { readonly tag: 'NotFound' }
-  | { readonly tag: 'LowReserve' }
+  | { readonly Success: ManageOfferSuccessResult }
+  | 'Malformed'
+  | 'SellNoTrust'
+  | 'BuyNoTrust'
+  | 'SellNotAuthorized'
+  | 'BuyNotAuthorized'
+  | 'LineFull'
+  | 'Underfunded'
+  | 'CrossSelf'
+  | 'SellNoIssuer'
+  | 'BuyNoIssuer'
+  | 'NotFound'
+  | 'LowReserve'
 ;
 
 export const ManageBuyOfferResult: XdrCodec<ManageBuyOfferResult> = taggedUnion({
@@ -3095,19 +3095,19 @@ export const PathPaymentStrictSendResultSuccess: XdrCodec<PathPaymentStrictSendR
 ]);
 
 export type PathPaymentStrictSendResult =
-  | { readonly tag: 'Success'; readonly value: PathPaymentStrictSendResultSuccess }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'SrcNoTrust' }
-  | { readonly tag: 'SrcNotAuthorized' }
-  | { readonly tag: 'NoDestination' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'NotAuthorized' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'NoIssuer'; readonly value: Asset }
-  | { readonly tag: 'TooFewOffers' }
-  | { readonly tag: 'OfferCrossSelf' }
-  | { readonly tag: 'UnderDestmin' }
+  | { readonly Success: PathPaymentStrictSendResultSuccess }
+  | 'Malformed'
+  | 'Underfunded'
+  | 'SrcNoTrust'
+  | 'SrcNotAuthorized'
+  | 'NoDestination'
+  | 'NoTrust'
+  | 'NotAuthorized'
+  | 'LineFull'
+  | { readonly NoIssuer: Asset }
+  | 'TooFewOffers'
+  | 'OfferCrossSelf'
+  | 'UnderDestmin'
 ;
 
 export const PathPaymentStrictSendResult: XdrCodec<PathPaymentStrictSendResult> = taggedUnion({
@@ -3131,12 +3131,12 @@ export const CreateClaimableBalanceResultCode = xdrEnum({
 });
 
 export type CreateClaimableBalanceResult =
-  | { readonly tag: 'Success'; readonly value: ClaimableBalanceID }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'LowReserve' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'NotAuthorized' }
-  | { readonly tag: 'Underfunded' }
+  | { readonly Success: ClaimableBalanceID }
+  | 'Malformed'
+  | 'LowReserve'
+  | 'NoTrust'
+  | 'NotAuthorized'
+  | 'Underfunded'
 ;
 
 export const CreateClaimableBalanceResult: XdrCodec<CreateClaimableBalanceResult> = taggedUnion({
@@ -3158,12 +3158,12 @@ export const ClaimClaimableBalanceResultCode = xdrEnum({
 });
 
 export type ClaimClaimableBalanceResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'DoesNotExist' }
-  | { readonly tag: 'CannotClaim' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'NotAuthorized' }
+  | 'Success'
+  | 'DoesNotExist'
+  | 'CannotClaim'
+  | 'LineFull'
+  | 'NoTrust'
+  | 'NotAuthorized'
 ;
 
 export const ClaimClaimableBalanceResult: XdrCodec<ClaimClaimableBalanceResult> = taggedUnion({
@@ -3183,10 +3183,10 @@ export const BeginSponsoringFutureReservesResultCode = xdrEnum({
 });
 
 export type BeginSponsoringFutureReservesResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'AlreadySponsored' }
-  | { readonly tag: 'Recursive' }
+  | 'Success'
+  | 'Malformed'
+  | 'AlreadySponsored'
+  | 'Recursive'
 ;
 
 export const BeginSponsoringFutureReservesResult: XdrCodec<BeginSponsoringFutureReservesResult> = taggedUnion({
@@ -3204,8 +3204,8 @@ export const EndSponsoringFutureReservesResultCode = xdrEnum({
 });
 
 export type EndSponsoringFutureReservesResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'NotSponsored' }
+  | 'Success'
+  | 'NotSponsored'
 ;
 
 export const EndSponsoringFutureReservesResult: XdrCodec<EndSponsoringFutureReservesResult> = taggedUnion({
@@ -3227,12 +3227,12 @@ export const RevokeSponsorshipResultCode = xdrEnum({
 });
 
 export type RevokeSponsorshipResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'DoesNotExist' }
-  | { readonly tag: 'NotSponsor' }
-  | { readonly tag: 'LowReserve' }
-  | { readonly tag: 'OnlyTransferable' }
-  | { readonly tag: 'Malformed' }
+  | 'Success'
+  | 'DoesNotExist'
+  | 'NotSponsor'
+  | 'LowReserve'
+  | 'OnlyTransferable'
+  | 'Malformed'
 ;
 
 export const RevokeSponsorshipResult: XdrCodec<RevokeSponsorshipResult> = taggedUnion({
@@ -3253,11 +3253,11 @@ export const ClawbackResultCode = xdrEnum({
 });
 
 export type ClawbackResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NotClawbackEnabled' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'Underfunded' }
+  | 'Success'
+  | 'Malformed'
+  | 'NotClawbackEnabled'
+  | 'NoTrust'
+  | 'Underfunded'
 ;
 
 export const ClawbackResult: XdrCodec<ClawbackResult> = taggedUnion({
@@ -3277,10 +3277,10 @@ export const ClawbackClaimableBalanceResultCode = xdrEnum({
 });
 
 export type ClawbackClaimableBalanceResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'DoesNotExist' }
-  | { readonly tag: 'NotIssuer' }
-  | { readonly tag: 'NotClawbackEnabled' }
+  | 'Success'
+  | 'DoesNotExist'
+  | 'NotIssuer'
+  | 'NotClawbackEnabled'
 ;
 
 export const ClawbackClaimableBalanceResult: XdrCodec<ClawbackClaimableBalanceResult> = taggedUnion({
@@ -3302,12 +3302,12 @@ export const SetTrustLineFlagsResultCode = xdrEnum({
 });
 
 export type SetTrustLineFlagsResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NoTrustLine' }
-  | { readonly tag: 'CantRevoke' }
-  | { readonly tag: 'InvalidState' }
-  | { readonly tag: 'LowReserve' }
+  | 'Success'
+  | 'Malformed'
+  | 'NoTrustLine'
+  | 'CantRevoke'
+  | 'InvalidState'
+  | 'LowReserve'
 ;
 
 export const SetTrustLineFlagsResult: XdrCodec<SetTrustLineFlagsResult> = taggedUnion({
@@ -3331,14 +3331,14 @@ export const LiquidityPoolDepositResultCode = xdrEnum({
 });
 
 export type LiquidityPoolDepositResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'NotAuthorized' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'BadPrice' }
-  | { readonly tag: 'PoolFull' }
+  | 'Success'
+  | 'Malformed'
+  | 'NoTrust'
+  | 'NotAuthorized'
+  | 'Underfunded'
+  | 'LineFull'
+  | 'BadPrice'
+  | 'PoolFull'
 ;
 
 export const LiquidityPoolDepositResult: XdrCodec<LiquidityPoolDepositResult> = taggedUnion({
@@ -3360,12 +3360,12 @@ export const LiquidityPoolWithdrawResultCode = xdrEnum({
 });
 
 export type LiquidityPoolWithdrawResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'NoTrust' }
-  | { readonly tag: 'Underfunded' }
-  | { readonly tag: 'LineFull' }
-  | { readonly tag: 'UnderMinimum' }
+  | 'Success'
+  | 'Malformed'
+  | 'NoTrust'
+  | 'Underfunded'
+  | 'LineFull'
+  | 'UnderMinimum'
 ;
 
 export const LiquidityPoolWithdrawResult: XdrCodec<LiquidityPoolWithdrawResult> = taggedUnion({
@@ -3387,12 +3387,12 @@ export const InvokeHostFunctionResultCode = xdrEnum({
 });
 
 export type InvokeHostFunctionResult =
-  | { readonly tag: 'Success'; readonly value: Hash }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'Trapped' }
-  | { readonly tag: 'ResourceLimitExceeded' }
-  | { readonly tag: 'EntryArchived' }
-  | { readonly tag: 'InsufficientRefundableFee' }
+  | { readonly Success: Hash }
+  | 'Malformed'
+  | 'Trapped'
+  | 'ResourceLimitExceeded'
+  | 'EntryArchived'
+  | 'InsufficientRefundableFee'
 ;
 
 export const InvokeHostFunctionResult: XdrCodec<InvokeHostFunctionResult> = taggedUnion({
@@ -3412,10 +3412,10 @@ export const ExtendFootprintTTLResultCode = xdrEnum({
 });
 
 export type ExtendFootprintTTLResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'ResourceLimitExceeded' }
-  | { readonly tag: 'InsufficientRefundableFee' }
+  | 'Success'
+  | 'Malformed'
+  | 'ResourceLimitExceeded'
+  | 'InsufficientRefundableFee'
 ;
 
 export const ExtendFootprintTTLResult: XdrCodec<ExtendFootprintTTLResult> = taggedUnion({
@@ -3435,10 +3435,10 @@ export const RestoreFootprintResultCode = xdrEnum({
 });
 
 export type RestoreFootprintResult =
-  | { readonly tag: 'Success' }
-  | { readonly tag: 'Malformed' }
-  | { readonly tag: 'ResourceLimitExceeded' }
-  | { readonly tag: 'InsufficientRefundableFee' }
+  | 'Success'
+  | 'Malformed'
+  | 'ResourceLimitExceeded'
+  | 'InsufficientRefundableFee'
 ;
 
 export const RestoreFootprintResult: XdrCodec<RestoreFootprintResult> = taggedUnion({
@@ -3450,33 +3450,33 @@ export const RestoreFootprintResult: XdrCodec<RestoreFootprintResult> = taggedUn
 }) as XdrCodec<RestoreFootprintResult>;
 
 export type OperationResultTr =
-  | { readonly tag: 'CreateAccount'; readonly value: CreateAccountResult }
-  | { readonly tag: 'Payment'; readonly value: PaymentResult }
-  | { readonly tag: 'PathPaymentStrictReceive'; readonly value: PathPaymentStrictReceiveResult }
-  | { readonly tag: 'ManageSellOffer'; readonly value: ManageSellOfferResult }
-  | { readonly tag: 'CreatePassiveSellOffer'; readonly value: ManageSellOfferResult }
-  | { readonly tag: 'SetOptions'; readonly value: SetOptionsResult }
-  | { readonly tag: 'ChangeTrust'; readonly value: ChangeTrustResult }
-  | { readonly tag: 'AllowTrust'; readonly value: AllowTrustResult }
-  | { readonly tag: 'AccountMerge'; readonly value: AccountMergeResult }
-  | { readonly tag: 'Inflation'; readonly value: InflationResult }
-  | { readonly tag: 'ManageData'; readonly value: ManageDataResult }
-  | { readonly tag: 'BumpSequence'; readonly value: BumpSequenceResult }
-  | { readonly tag: 'ManageBuyOffer'; readonly value: ManageBuyOfferResult }
-  | { readonly tag: 'PathPaymentStrictSend'; readonly value: PathPaymentStrictSendResult }
-  | { readonly tag: 'CreateClaimableBalance'; readonly value: CreateClaimableBalanceResult }
-  | { readonly tag: 'ClaimClaimableBalance'; readonly value: ClaimClaimableBalanceResult }
-  | { readonly tag: 'BeginSponsoringFutureReserves'; readonly value: BeginSponsoringFutureReservesResult }
-  | { readonly tag: 'EndSponsoringFutureReserves'; readonly value: EndSponsoringFutureReservesResult }
-  | { readonly tag: 'RevokeSponsorship'; readonly value: RevokeSponsorshipResult }
-  | { readonly tag: 'Clawback'; readonly value: ClawbackResult }
-  | { readonly tag: 'ClawbackClaimableBalance'; readonly value: ClawbackClaimableBalanceResult }
-  | { readonly tag: 'SetTrustLineFlags'; readonly value: SetTrustLineFlagsResult }
-  | { readonly tag: 'LiquidityPoolDeposit'; readonly value: LiquidityPoolDepositResult }
-  | { readonly tag: 'LiquidityPoolWithdraw'; readonly value: LiquidityPoolWithdrawResult }
-  | { readonly tag: 'InvokeHostFunction'; readonly value: InvokeHostFunctionResult }
-  | { readonly tag: 'ExtendFootprintTtl'; readonly value: ExtendFootprintTTLResult }
-  | { readonly tag: 'RestoreFootprint'; readonly value: RestoreFootprintResult }
+  | { readonly CreateAccount: CreateAccountResult }
+  | { readonly Payment: PaymentResult }
+  | { readonly PathPaymentStrictReceive: PathPaymentStrictReceiveResult }
+  | { readonly ManageSellOffer: ManageSellOfferResult }
+  | { readonly CreatePassiveSellOffer: ManageSellOfferResult }
+  | { readonly SetOptions: SetOptionsResult }
+  | { readonly ChangeTrust: ChangeTrustResult }
+  | { readonly AllowTrust: AllowTrustResult }
+  | { readonly AccountMerge: AccountMergeResult }
+  | { readonly Inflation: InflationResult }
+  | { readonly ManageData: ManageDataResult }
+  | { readonly BumpSequence: BumpSequenceResult }
+  | { readonly ManageBuyOffer: ManageBuyOfferResult }
+  | { readonly PathPaymentStrictSend: PathPaymentStrictSendResult }
+  | { readonly CreateClaimableBalance: CreateClaimableBalanceResult }
+  | { readonly ClaimClaimableBalance: ClaimClaimableBalanceResult }
+  | { readonly BeginSponsoringFutureReserves: BeginSponsoringFutureReservesResult }
+  | { readonly EndSponsoringFutureReserves: EndSponsoringFutureReservesResult }
+  | { readonly RevokeSponsorship: RevokeSponsorshipResult }
+  | { readonly Clawback: ClawbackResult }
+  | { readonly ClawbackClaimableBalance: ClawbackClaimableBalanceResult }
+  | { readonly SetTrustLineFlags: SetTrustLineFlagsResult }
+  | { readonly LiquidityPoolDeposit: LiquidityPoolDepositResult }
+  | { readonly LiquidityPoolWithdraw: LiquidityPoolWithdrawResult }
+  | { readonly InvokeHostFunction: InvokeHostFunctionResult }
+  | { readonly ExtendFootprintTtl: ExtendFootprintTTLResult }
+  | { readonly RestoreFootprint: RestoreFootprintResult }
 ;
 
 export const OperationResultTr: XdrCodec<OperationResultTr> = taggedUnion({
@@ -3513,13 +3513,13 @@ export const OperationResultTr: XdrCodec<OperationResultTr> = taggedUnion({
 }) as XdrCodec<OperationResultTr>;
 
 export type OperationResult =
-  | { readonly tag: 'OpINNER'; readonly value: OperationResultTr }
-  | { readonly tag: 'OpBADAuth' }
-  | { readonly tag: 'OpNOAccount' }
-  | { readonly tag: 'OpNOTSupported' }
-  | { readonly tag: 'OpTOOManySubentries' }
-  | { readonly tag: 'OpEXCEEDEDWorkLimit' }
-  | { readonly tag: 'OpTOOManySponsoring' }
+  | { readonly OpINNER: OperationResultTr }
+  | 'OpBADAuth'
+  | 'OpNOAccount'
+  | 'OpNOTSupported'
+  | 'OpTOOManySubentries'
+  | 'OpEXCEEDEDWorkLimit'
+  | 'OpTOOManySponsoring'
 ;
 
 export const OperationResult: XdrCodec<OperationResult> = taggedUnion({
@@ -3531,23 +3531,23 @@ export const OperationResult: XdrCodec<OperationResult> = taggedUnion({
 }) as XdrCodec<OperationResult>;
 
 export type InnerTransactionResultResult =
-  | { readonly tag: 'TxSUCCESS'; readonly value: readonly OperationResult[] }
-  | { readonly tag: 'TxFAILED'; readonly value: readonly OperationResult[] }
-  | { readonly tag: 'TxTOOEarly' }
-  | { readonly tag: 'TxTOOLate' }
-  | { readonly tag: 'TxMISSINGOperation' }
-  | { readonly tag: 'TxBADSeq' }
-  | { readonly tag: 'TxBADAuth' }
-  | { readonly tag: 'TxINSUFFICIENTBalance' }
-  | { readonly tag: 'TxNOAccount' }
-  | { readonly tag: 'TxINSUFFICIENTFee' }
-  | { readonly tag: 'TxBADAuthExtra' }
-  | { readonly tag: 'TxINTERNALError' }
-  | { readonly tag: 'TxNOTSupported' }
-  | { readonly tag: 'TxBADSponsorship' }
-  | { readonly tag: 'TxBADMinSeqAgeOrGap' }
-  | { readonly tag: 'TxMALFORMED' }
-  | { readonly tag: 'TxSOROBANInvalid' }
+  | { readonly TxSUCCESS: readonly OperationResult[] }
+  | { readonly TxFAILED: readonly OperationResult[] }
+  | 'TxTOOEarly'
+  | 'TxTOOLate'
+  | 'TxMISSINGOperation'
+  | 'TxBADSeq'
+  | 'TxBADAuth'
+  | 'TxINSUFFICIENTBalance'
+  | 'TxNOAccount'
+  | 'TxINSUFFICIENTFee'
+  | 'TxBADAuthExtra'
+  | 'TxINTERNALError'
+  | 'TxNOTSupported'
+  | 'TxBADSponsorship'
+  | 'TxBADMinSeqAgeOrGap'
+  | 'TxMALFORMED'
+  | 'TxSOROBANInvalid'
 ;
 
 export const InnerTransactionResultResult: XdrCodec<InnerTransactionResultResult> = taggedUnion({
@@ -3559,7 +3559,7 @@ export const InnerTransactionResultResult: XdrCodec<InnerTransactionResultResult
 }) as XdrCodec<InnerTransactionResultResult>;
 
 export type InnerTransactionResultExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const InnerTransactionResultExt: XdrCodec<InnerTransactionResultExt> = taggedUnion({
@@ -3590,25 +3590,25 @@ export const InnerTransactionResultPair: XdrCodec<InnerTransactionResultPair> = 
 ]);
 
 export type TransactionResultResult =
-  | { readonly tag: 'TxFEEBumpInnerSuccess'; readonly value: InnerTransactionResultPair }
-  | { readonly tag: 'TxFEEBumpInnerFailed'; readonly value: InnerTransactionResultPair }
-  | { readonly tag: 'TxSUCCESS'; readonly value: readonly OperationResult[] }
-  | { readonly tag: 'TxFAILED'; readonly value: readonly OperationResult[] }
-  | { readonly tag: 'TxTOOEarly' }
-  | { readonly tag: 'TxTOOLate' }
-  | { readonly tag: 'TxMISSINGOperation' }
-  | { readonly tag: 'TxBADSeq' }
-  | { readonly tag: 'TxBADAuth' }
-  | { readonly tag: 'TxINSUFFICIENTBalance' }
-  | { readonly tag: 'TxNOAccount' }
-  | { readonly tag: 'TxINSUFFICIENTFee' }
-  | { readonly tag: 'TxBADAuthExtra' }
-  | { readonly tag: 'TxINTERNALError' }
-  | { readonly tag: 'TxNOTSupported' }
-  | { readonly tag: 'TxBADSponsorship' }
-  | { readonly tag: 'TxBADMinSeqAgeOrGap' }
-  | { readonly tag: 'TxMALFORMED' }
-  | { readonly tag: 'TxSOROBANInvalid' }
+  | { readonly TxFEEBumpInnerSuccess: InnerTransactionResultPair }
+  | { readonly TxFEEBumpInnerFailed: InnerTransactionResultPair }
+  | { readonly TxSUCCESS: readonly OperationResult[] }
+  | { readonly TxFAILED: readonly OperationResult[] }
+  | 'TxTOOEarly'
+  | 'TxTOOLate'
+  | 'TxMISSINGOperation'
+  | 'TxBADSeq'
+  | 'TxBADAuth'
+  | 'TxINSUFFICIENTBalance'
+  | 'TxNOAccount'
+  | 'TxINSUFFICIENTFee'
+  | 'TxBADAuthExtra'
+  | 'TxINTERNALError'
+  | 'TxNOTSupported'
+  | 'TxBADSponsorship'
+  | 'TxBADMinSeqAgeOrGap'
+  | 'TxMALFORMED'
+  | 'TxSOROBANInvalid'
 ;
 
 export const TransactionResultResult: XdrCodec<TransactionResultResult> = taggedUnion({
@@ -3621,7 +3621,7 @@ export const TransactionResultResult: XdrCodec<TransactionResultResult> = tagged
 }) as XdrCodec<TransactionResultResult>;
 
 export type TransactionResultExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const TransactionResultExt: XdrCodec<TransactionResultExt> = taggedUnion({
@@ -3689,8 +3689,8 @@ export const AccountEntryExtensionV3: XdrCodec<AccountEntryExtensionV3> = xdrStr
 ]);
 
 export type AccountEntryExtensionV2Ext =
-  | { readonly tag: 0 }
-  | { readonly tag: 3; readonly value: AccountEntryExtensionV3 }
+  | '0'
+  | { readonly '3': AccountEntryExtensionV3 }
 ;
 
 export const AccountEntryExtensionV2Ext: XdrCodec<AccountEntryExtensionV2Ext> = taggedUnion({
@@ -3715,8 +3715,8 @@ export const AccountEntryExtensionV2: XdrCodec<AccountEntryExtensionV2> = xdrStr
 ]);
 
 export type AccountEntryExtensionV1Ext =
-  | { readonly tag: 0 }
-  | { readonly tag: 2; readonly value: AccountEntryExtensionV2 }
+  | '0'
+  | { readonly '2': AccountEntryExtensionV2 }
 ;
 
 export const AccountEntryExtensionV1Ext: XdrCodec<AccountEntryExtensionV1Ext> = taggedUnion({
@@ -3737,8 +3737,8 @@ export const AccountEntryExtensionV1: XdrCodec<AccountEntryExtensionV1> = xdrStr
 ]);
 
 export type AccountEntryExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: AccountEntryExtensionV1 }
+  | '0'
+  | { readonly '1': AccountEntryExtensionV1 }
 ;
 
 export const AccountEntryExt: XdrCodec<AccountEntryExt> = taggedUnion({
@@ -3754,7 +3754,7 @@ export interface AccountEntry {
   readonly balance: Int64;
   readonly seqNum: SequenceNumber;
   readonly numSubEntries: Uint32;
-  readonly inflationDest: AccountID | undefined;
+  readonly inflationDest: AccountID | null;
   readonly flags: Uint32;
   readonly homeDomain: String32;
   readonly thresholds: Thresholds;
@@ -3775,7 +3775,7 @@ export const AccountEntry: XdrCodec<AccountEntry> = xdrStruct<AccountEntry>([
 ]);
 
 export type TrustLineEntryExtensionV2Ext =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const TrustLineEntryExtensionV2Ext: XdrCodec<TrustLineEntryExtensionV2Ext> = taggedUnion({
@@ -3795,8 +3795,8 @@ export const TrustLineEntryExtensionV2: XdrCodec<TrustLineEntryExtensionV2> = xd
 ]);
 
 export type TrustLineEntryV1Ext =
-  | { readonly tag: 0 }
-  | { readonly tag: 2; readonly value: TrustLineEntryExtensionV2 }
+  | '0'
+  | { readonly '2': TrustLineEntryExtensionV2 }
 ;
 
 export const TrustLineEntryV1Ext: XdrCodec<TrustLineEntryV1Ext> = taggedUnion({
@@ -3817,8 +3817,8 @@ export const TrustLineEntryV1: XdrCodec<TrustLineEntryV1> = xdrStruct<TrustLineE
 ]);
 
 export type TrustLineEntryExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: TrustLineEntryV1 }
+  | '0'
+  | { readonly '1': TrustLineEntryV1 }
 ;
 
 export const TrustLineEntryExt: XdrCodec<TrustLineEntryExt> = taggedUnion({
@@ -3847,7 +3847,7 @@ export const TrustLineEntry: XdrCodec<TrustLineEntry> = xdrStruct<TrustLineEntry
 ]);
 
 export type DataEntryExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const DataEntryExt: XdrCodec<DataEntryExt> = taggedUnion({
@@ -3871,7 +3871,7 @@ export const DataEntry: XdrCodec<DataEntry> = xdrStruct<DataEntry>([
 ]);
 
 export type ClaimableBalanceEntryExtensionV1Ext =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const ClaimableBalanceEntryExtensionV1Ext: XdrCodec<ClaimableBalanceEntryExtensionV1Ext> = taggedUnion({
@@ -3891,8 +3891,8 @@ export const ClaimableBalanceEntryExtensionV1: XdrCodec<ClaimableBalanceEntryExt
 ]);
 
 export type ClaimableBalanceEntryExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: ClaimableBalanceEntryExtensionV1 }
+  | '0'
+  | { readonly '1': ClaimableBalanceEntryExtensionV1 }
 ;
 
 export const ClaimableBalanceEntryExt: XdrCodec<ClaimableBalanceEntryExt> = taggedUnion({
@@ -3934,7 +3934,7 @@ export const LiquidityPoolEntryConstantProduct: XdrCodec<LiquidityPoolEntryConst
 ]);
 
 export type LiquidityPoolEntryBody =
-  | { readonly tag: 'LiquidityPoolConstantProduct'; readonly value: LiquidityPoolEntryConstantProduct }
+  | { readonly LiquidityPoolConstantProduct: LiquidityPoolEntryConstantProduct }
 ;
 
 export const LiquidityPoolEntryBody: XdrCodec<LiquidityPoolEntryBody> = taggedUnion({
@@ -4005,8 +4005,8 @@ export const ContractCodeEntryV1: XdrCodec<ContractCodeEntryV1> = xdrStruct<Cont
 ]);
 
 export type ContractCodeEntryExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: ContractCodeEntryV1 }
+  | '0'
+  | { readonly '1': ContractCodeEntryV1 }
 ;
 
 export const ContractCodeEntryExt: XdrCodec<ContractCodeEntryExt> = taggedUnion({
@@ -4038,16 +4038,16 @@ export const TTLEntry: XdrCodec<TTLEntry> = xdrStruct<TTLEntry>([
 ]);
 
 export type LedgerEntryData =
-  | { readonly tag: 'Account'; readonly value: AccountEntry }
-  | { readonly tag: 'Trustline'; readonly value: TrustLineEntry }
-  | { readonly tag: 'Offer'; readonly value: OfferEntry }
-  | { readonly tag: 'Data'; readonly value: DataEntry }
-  | { readonly tag: 'ClaimableBalance'; readonly value: ClaimableBalanceEntry }
-  | { readonly tag: 'LiquidityPool'; readonly value: LiquidityPoolEntry }
-  | { readonly tag: 'ContractData'; readonly value: ContractDataEntry }
-  | { readonly tag: 'ContractCode'; readonly value: ContractCodeEntry }
-  | { readonly tag: 'ConfigSetting'; readonly value: ConfigSettingEntry }
-  | { readonly tag: 'Ttl'; readonly value: TTLEntry }
+  | { readonly Account: AccountEntry }
+  | { readonly Trustline: TrustLineEntry }
+  | { readonly Offer: OfferEntry }
+  | { readonly Data: DataEntry }
+  | { readonly ClaimableBalance: ClaimableBalanceEntry }
+  | { readonly LiquidityPool: LiquidityPoolEntry }
+  | { readonly ContractData: ContractDataEntry }
+  | { readonly ContractCode: ContractCodeEntry }
+  | { readonly ConfigSetting: ConfigSettingEntry }
+  | { readonly Ttl: TTLEntry }
 ;
 
 export const LedgerEntryData: XdrCodec<LedgerEntryData> = taggedUnion({
@@ -4067,7 +4067,7 @@ export const LedgerEntryData: XdrCodec<LedgerEntryData> = taggedUnion({
 }) as XdrCodec<LedgerEntryData>;
 
 export type LedgerEntryExtensionV1Ext =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const LedgerEntryExtensionV1Ext: XdrCodec<LedgerEntryExtensionV1Ext> = taggedUnion({
@@ -4087,8 +4087,8 @@ export const LedgerEntryExtensionV1: XdrCodec<LedgerEntryExtensionV1> = xdrStruc
 ]);
 
 export type LedgerEntryExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: LedgerEntryExtensionV1 }
+  | '0'
+  | { readonly '1': LedgerEntryExtensionV1 }
 ;
 
 export const LedgerEntryExt: XdrCodec<LedgerEntryExt> = taggedUnion({
@@ -4111,11 +4111,11 @@ export const LedgerEntry: XdrCodec<LedgerEntry> = xdrStruct<LedgerEntry>([
 ]);
 
 export type LedgerEntryChange =
-  | { readonly tag: 'Created'; readonly value: LedgerEntry }
-  | { readonly tag: 'Updated'; readonly value: LedgerEntry }
-  | { readonly tag: 'Removed'; readonly value: LedgerKey }
-  | { readonly tag: 'State'; readonly value: LedgerEntry }
-  | { readonly tag: 'Restored'; readonly value: LedgerEntry }
+  | { readonly Created: LedgerEntry }
+  | { readonly Updated: LedgerEntry }
+  | { readonly Removed: LedgerKey }
+  | { readonly State: LedgerEntry }
+  | { readonly Restored: LedgerEntry }
 ;
 
 export const LedgerEntryChange: XdrCodec<LedgerEntryChange> = taggedUnion({
@@ -4173,8 +4173,8 @@ export const SorobanTransactionMetaExtV1: XdrCodec<SorobanTransactionMetaExtV1> 
 ]);
 
 export type SorobanTransactionMetaExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: SorobanTransactionMetaExtV1 }
+  | '0'
+  | { readonly '1': SorobanTransactionMetaExtV1 }
 ;
 
 export const SorobanTransactionMetaExt: XdrCodec<SorobanTransactionMetaExt> = taggedUnion({
@@ -4202,7 +4202,7 @@ export const ContractEventV0: XdrCodec<ContractEventV0> = xdrStruct<ContractEven
 ]);
 
 export type ContractEventBody =
-  | { readonly tag: 0; readonly value: ContractEventV0 }
+  | { readonly '0': ContractEventV0 }
 ;
 
 export const ContractEventBody: XdrCodec<ContractEventBody> = taggedUnion({
@@ -4214,7 +4214,7 @@ export const ContractEventBody: XdrCodec<ContractEventBody> = taggedUnion({
 
 export interface ContractEvent {
   readonly ext: ExtensionPoint;
-  readonly contractID: ContractID | undefined;
+  readonly contractID: ContractID | null;
   readonly type: ContractEventType;
   readonly body: ContractEventBody;
 }
@@ -4252,7 +4252,7 @@ export interface TransactionMetaV3 {
   readonly txChangesBefore: LedgerEntryChanges;
   readonly operations: readonly OperationMeta[];
   readonly txChangesAfter: LedgerEntryChanges;
-  readonly sorobanMeta: SorobanTransactionMeta | undefined;
+  readonly sorobanMeta: SorobanTransactionMeta | null;
 }
 export const TransactionMetaV3: XdrCodec<TransactionMetaV3> = xdrStruct<TransactionMetaV3>([
   ['ext', ExtensionPoint],
@@ -4275,7 +4275,7 @@ export const OperationMetaV2: XdrCodec<OperationMetaV2> = xdrStruct<OperationMet
 
 export interface SorobanTransactionMetaV2 {
   readonly ext: SorobanTransactionMetaExt;
-  readonly returnValue: SCVal | undefined;
+  readonly returnValue: SCVal | null;
 }
 export const SorobanTransactionMetaV2: XdrCodec<SorobanTransactionMetaV2> = xdrStruct<SorobanTransactionMetaV2>([
   ['ext', SorobanTransactionMetaExt],
@@ -4303,7 +4303,7 @@ export interface TransactionMetaV4 {
   readonly txChangesBefore: LedgerEntryChanges;
   readonly operations: readonly OperationMetaV2[];
   readonly txChangesAfter: LedgerEntryChanges;
-  readonly sorobanMeta: SorobanTransactionMetaV2 | undefined;
+  readonly sorobanMeta: SorobanTransactionMetaV2 | null;
   readonly events: readonly TransactionEvent[];
   readonly diagnosticEvents: readonly DiagnosticEvent[];
 }
@@ -4318,11 +4318,11 @@ export const TransactionMetaV4: XdrCodec<TransactionMetaV4> = xdrStruct<Transact
 ]);
 
 export type TransactionMeta =
-  | { readonly tag: 0; readonly value: readonly OperationMeta[] }
-  | { readonly tag: 1; readonly value: TransactionMetaV1 }
-  | { readonly tag: 2; readonly value: TransactionMetaV2 }
-  | { readonly tag: 3; readonly value: TransactionMetaV3 }
-  | { readonly tag: 4; readonly value: TransactionMetaV4 }
+  | { readonly '0': readonly OperationMeta[] }
+  | { readonly '1': TransactionMetaV1 }
+  | { readonly '2': TransactionMetaV2 }
+  | { readonly '3': TransactionMetaV3 }
+  | { readonly '4': TransactionMetaV4 }
 ;
 
 export const TransactionMeta: XdrCodec<TransactionMeta> = taggedUnion({
@@ -4368,13 +4368,13 @@ export const ConfigUpgradeSetKey: XdrCodec<ConfigUpgradeSetKey> = xdrStruct<Conf
 ]);
 
 export type LedgerUpgrade =
-  | { readonly tag: 'Version'; readonly value: Uint32 }
-  | { readonly tag: 'BaseFee'; readonly value: Uint32 }
-  | { readonly tag: 'MaxTxSetSize'; readonly value: Uint32 }
-  | { readonly tag: 'BaseReserve'; readonly value: Uint32 }
-  | { readonly tag: 'Flags'; readonly value: Uint32 }
-  | { readonly tag: 'Config'; readonly value: ConfigUpgradeSetKey }
-  | { readonly tag: 'MaxSorobanTxSetSize'; readonly value: Uint32 }
+  | { readonly Version: Uint32 }
+  | { readonly BaseFee: Uint32 }
+  | { readonly MaxTxSetSize: Uint32 }
+  | { readonly BaseReserve: Uint32 }
+  | { readonly Flags: Uint32 }
+  | { readonly Config: ConfigUpgradeSetKey }
+  | { readonly MaxSorobanTxSetSize: Uint32 }
 ;
 
 export const LedgerUpgrade: XdrCodec<LedgerUpgrade> = taggedUnion({
@@ -4433,8 +4433,8 @@ export const SCPBallot: XdrCodec<SCPBallot> = xdrStruct<SCPBallot>([
 export interface SCPStatementPrepare {
   readonly quorumSetHash: Hash;
   readonly ballot: SCPBallot;
-  readonly prepared: SCPBallot | undefined;
-  readonly preparedPrime: SCPBallot | undefined;
+  readonly prepared: SCPBallot | null;
+  readonly preparedPrime: SCPBallot | null;
   readonly nC: Uint32;
   readonly nH: Uint32;
 }
@@ -4485,10 +4485,10 @@ export const SCPNomination: XdrCodec<SCPNomination> = xdrStruct<SCPNomination>([
 ]);
 
 export type SCPStatementPledges =
-  | { readonly tag: 'Prepare'; readonly value: SCPStatementPrepare }
-  | { readonly tag: 'Confirm'; readonly value: SCPStatementConfirm }
-  | { readonly tag: 'Externalize'; readonly value: SCPStatementExternalize }
-  | { readonly tag: 'Nominate'; readonly value: SCPNomination }
+  | { readonly Prepare: SCPStatementPrepare }
+  | { readonly Confirm: SCPStatementConfirm }
+  | { readonly Externalize: SCPStatementExternalize }
+  | { readonly Nominate: SCPNomination }
 ;
 
 export const SCPStatementPledges: XdrCodec<SCPStatementPledges> = taggedUnion({
@@ -4540,7 +4540,7 @@ export const SCPHistoryEntryV0: XdrCodec<SCPHistoryEntryV0> = xdrStruct<SCPHisto
 ]);
 
 export type SCPHistoryEntry =
-  | { readonly tag: 0; readonly value: SCPHistoryEntryV0 }
+  | { readonly '0': SCPHistoryEntryV0 }
 ;
 
 export const SCPHistoryEntry: XdrCodec<SCPHistoryEntry> = taggedUnion({
@@ -4575,8 +4575,8 @@ export const LedgerCloseMetaExtV1: XdrCodec<LedgerCloseMetaExtV1> = xdrStruct<Le
 ]);
 
 export type LedgerCloseMetaExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: LedgerCloseMetaExtV1 }
+  | '0'
+  | { readonly '1': LedgerCloseMetaExtV1 }
 ;
 
 export const LedgerCloseMetaExt: XdrCodec<LedgerCloseMetaExt> = taggedUnion({
@@ -4593,7 +4593,7 @@ export const TxSetComponentType = xdrEnum({
 });
 
 export interface TxSetComponentTxsMaybeDiscountedFee {
-  readonly baseFee: Int64 | undefined;
+  readonly baseFee: Int64 | null;
   readonly txs: readonly TransactionEnvelope[];
 }
 export const TxSetComponentTxsMaybeDiscountedFee: XdrCodec<TxSetComponentTxsMaybeDiscountedFee> = xdrStruct<TxSetComponentTxsMaybeDiscountedFee>([
@@ -4602,7 +4602,7 @@ export const TxSetComponentTxsMaybeDiscountedFee: XdrCodec<TxSetComponentTxsMayb
 ]);
 
 export type TxSetComponent =
-  | { readonly tag: 'TxsetCompTxsMaybeDiscountedFee'; readonly value: TxSetComponentTxsMaybeDiscountedFee }
+  | { readonly TxsetCompTxsMaybeDiscountedFee: TxSetComponentTxsMaybeDiscountedFee }
 ;
 
 export const TxSetComponent: XdrCodec<TxSetComponent> = taggedUnion({
@@ -4619,7 +4619,7 @@ export type ParallelTxExecutionStage = readonly DependentTxCluster[];
 export const ParallelTxExecutionStage: XdrCodec<ParallelTxExecutionStage> = varArray(2147483647, DependentTxCluster);
 
 export interface ParallelTxsComponent {
-  readonly baseFee: Int64 | undefined;
+  readonly baseFee: Int64 | null;
   readonly executionStages: readonly ParallelTxExecutionStage[];
 }
 export const ParallelTxsComponent: XdrCodec<ParallelTxsComponent> = xdrStruct<ParallelTxsComponent>([
@@ -4628,8 +4628,8 @@ export const ParallelTxsComponent: XdrCodec<ParallelTxsComponent> = xdrStruct<Pa
 ]);
 
 export type TransactionPhase =
-  | { readonly tag: 0; readonly value: readonly TxSetComponent[] }
-  | { readonly tag: 1; readonly value: ParallelTxsComponent }
+  | { readonly '0': readonly TxSetComponent[] }
+  | { readonly '1': ParallelTxsComponent }
 ;
 
 export const TransactionPhase: XdrCodec<TransactionPhase> = taggedUnion({
@@ -4650,7 +4650,7 @@ export const TransactionSetV1: XdrCodec<TransactionSetV1> = xdrStruct<Transactio
 ]);
 
 export type GeneralizedTransactionSet =
-  | { readonly tag: 1; readonly value: TransactionSetV1 }
+  | { readonly '1': TransactionSetV1 }
 ;
 
 export const GeneralizedTransactionSet: XdrCodec<GeneralizedTransactionSet> = taggedUnion({
@@ -4720,9 +4720,9 @@ export const LedgerCloseMetaV2: XdrCodec<LedgerCloseMetaV2> = xdrStruct<LedgerCl
 ]);
 
 export type LedgerCloseMeta =
-  | { readonly tag: 0; readonly value: LedgerCloseMetaV0 }
-  | { readonly tag: 1; readonly value: LedgerCloseMetaV1 }
-  | { readonly tag: 2; readonly value: LedgerCloseMetaV2 }
+  | { readonly '0': LedgerCloseMetaV0 }
+  | { readonly '1': LedgerCloseMetaV1 }
+  | { readonly '2': LedgerCloseMetaV2 }
 ;
 
 export const LedgerCloseMeta: XdrCodec<LedgerCloseMeta> = taggedUnion({
@@ -4746,8 +4746,8 @@ export const LedgerCloseMetaBatch: XdrCodec<LedgerCloseMetaBatch> = xdrStruct<Le
 ]);
 
 export type StoredTransactionSet =
-  | { readonly tag: 0; readonly value: TransactionSet }
-  | { readonly tag: 1; readonly value: GeneralizedTransactionSet }
+  | { readonly '0': TransactionSet }
+  | { readonly '1': GeneralizedTransactionSet }
 ;
 
 export const StoredTransactionSet: XdrCodec<StoredTransactionSet> = taggedUnion({
@@ -4790,8 +4790,8 @@ export const PersistedSCPStateV1: XdrCodec<PersistedSCPStateV1> = xdrStruct<Pers
 ]);
 
 export type PersistedSCPState =
-  | { readonly tag: 0; readonly value: PersistedSCPStateV0 }
-  | { readonly tag: 1; readonly value: PersistedSCPStateV1 }
+  | { readonly '0': PersistedSCPStateV0 }
+  | { readonly '1': PersistedSCPStateV1 }
 ;
 
 export const PersistedSCPState: XdrCodec<PersistedSCPState> = taggedUnion({
@@ -4871,8 +4871,8 @@ export const HotArchiveBucketEntryType = xdrEnum({
 });
 
 export type BucketMetadataExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: BucketListType }
+  | '0'
+  | { readonly '1': BucketListType }
 ;
 
 export const BucketMetadataExt: XdrCodec<BucketMetadataExt> = taggedUnion({
@@ -4893,10 +4893,10 @@ export const BucketMetadata: XdrCodec<BucketMetadata> = xdrStruct<BucketMetadata
 ]);
 
 export type BucketEntry =
-  | { readonly tag: 'Liveentry'; readonly value: LedgerEntry }
-  | { readonly tag: 'Initentry'; readonly value: LedgerEntry }
-  | { readonly tag: 'Deadentry'; readonly value: LedgerKey }
-  | { readonly tag: 'Metaentry'; readonly value: BucketMetadata }
+  | { readonly Liveentry: LedgerEntry }
+  | { readonly Initentry: LedgerEntry }
+  | { readonly Deadentry: LedgerKey }
+  | { readonly Metaentry: BucketMetadata }
 ;
 
 export const BucketEntry: XdrCodec<BucketEntry> = taggedUnion({
@@ -4909,9 +4909,9 @@ export const BucketEntry: XdrCodec<BucketEntry> = taggedUnion({
 }) as XdrCodec<BucketEntry>;
 
 export type HotArchiveBucketEntry =
-  | { readonly tag: 'Archived'; readonly value: LedgerEntry }
-  | { readonly tag: 'Live'; readonly value: LedgerKey }
-  | { readonly tag: 'Metaentry'; readonly value: BucketMetadata }
+  | { readonly Archived: LedgerEntry }
+  | { readonly Live: LedgerKey }
+  | { readonly Metaentry: BucketMetadata }
 ;
 
 export const HotArchiveBucketEntry: XdrCodec<HotArchiveBucketEntry> = taggedUnion({
@@ -4947,8 +4947,8 @@ export const TransactionResultSet: XdrCodec<TransactionResultSet> = xdrStruct<Tr
 ]);
 
 export type TransactionHistoryEntryExt =
-  | { readonly tag: 0 }
-  | { readonly tag: 1; readonly value: GeneralizedTransactionSet }
+  | '0'
+  | { readonly '1': GeneralizedTransactionSet }
 ;
 
 export const TransactionHistoryEntryExt: XdrCodec<TransactionHistoryEntryExt> = taggedUnion({
@@ -4971,7 +4971,7 @@ export const TransactionHistoryEntry: XdrCodec<TransactionHistoryEntry> = xdrStr
 ]);
 
 export type TransactionHistoryResultEntryExt =
-  | { readonly tag: 0 }
+  | '0'
 ;
 
 export const TransactionHistoryResultEntryExt: XdrCodec<TransactionHistoryResultEntryExt> = taggedUnion({
@@ -5092,8 +5092,8 @@ export const IPAddrType = xdrEnum({
 });
 
 export type PeerAddressIp =
-  | { readonly tag: 'IPv4'; readonly value: Uint8Array }
-  | { readonly tag: 'IPv6'; readonly value: Uint8Array }
+  | { readonly IPv4: Uint8Array }
+  | { readonly IPv6: Uint8Array }
 ;
 
 export const PeerAddressIp: XdrCodec<PeerAddressIp> = taggedUnion({
@@ -5356,7 +5356,7 @@ export const TopologyResponseBodyV2: XdrCodec<TopologyResponseBodyV2> = xdrStruc
 ]);
 
 export type SurveyResponseBody =
-  | { readonly tag: 'SurveyTopologyResponseV2'; readonly value: TopologyResponseBodyV2 }
+  | { readonly SurveyTopologyResponseV2: TopologyResponseBodyV2 }
 ;
 
 export const SurveyResponseBody: XdrCodec<SurveyResponseBody> = taggedUnion({
@@ -5391,27 +5391,27 @@ export const FloodDemand: XdrCodec<FloodDemand> = xdrStruct<FloodDemand>([
 ]);
 
 export type StellarMessage =
-  | { readonly tag: 'ErrorMsg'; readonly value: Error }
-  | { readonly tag: 'Hello'; readonly value: Hello }
-  | { readonly tag: 'Auth'; readonly value: Auth }
-  | { readonly tag: 'DontHave'; readonly value: DontHave }
-  | { readonly tag: 'Peers'; readonly value: readonly PeerAddress[] }
-  | { readonly tag: 'GetTxSet'; readonly value: Uint256 }
-  | { readonly tag: 'TxSet'; readonly value: TransactionSet }
-  | { readonly tag: 'GeneralizedTxSet'; readonly value: GeneralizedTransactionSet }
-  | { readonly tag: 'Transaction'; readonly value: TransactionEnvelope }
-  | { readonly tag: 'TimeSlicedSurveyRequest'; readonly value: SignedTimeSlicedSurveyRequestMessage }
-  | { readonly tag: 'TimeSlicedSurveyResponse'; readonly value: SignedTimeSlicedSurveyResponseMessage }
-  | { readonly tag: 'TimeSlicedSurveyStartCollecting'; readonly value: SignedTimeSlicedSurveyStartCollectingMessage }
-  | { readonly tag: 'TimeSlicedSurveyStopCollecting'; readonly value: SignedTimeSlicedSurveyStopCollectingMessage }
-  | { readonly tag: 'GetScpQuorumset'; readonly value: Uint256 }
-  | { readonly tag: 'ScpQuorumset'; readonly value: SCPQuorumSet }
-  | { readonly tag: 'ScpMessage'; readonly value: SCPEnvelope }
-  | { readonly tag: 'GetScpState'; readonly value: Uint32 }
-  | { readonly tag: 'SendMore'; readonly value: SendMore }
-  | { readonly tag: 'SendMoreExtended'; readonly value: SendMoreExtended }
-  | { readonly tag: 'FloodAdvert'; readonly value: FloodAdvert }
-  | { readonly tag: 'FloodDemand'; readonly value: FloodDemand }
+  | { readonly ErrorMsg: Error }
+  | { readonly Hello: Hello }
+  | { readonly Auth: Auth }
+  | { readonly DontHave: DontHave }
+  | { readonly Peers: readonly PeerAddress[] }
+  | { readonly GetTxSet: Uint256 }
+  | { readonly TxSet: TransactionSet }
+  | { readonly GeneralizedTxSet: GeneralizedTransactionSet }
+  | { readonly Transaction: TransactionEnvelope }
+  | { readonly TimeSlicedSurveyRequest: SignedTimeSlicedSurveyRequestMessage }
+  | { readonly TimeSlicedSurveyResponse: SignedTimeSlicedSurveyResponseMessage }
+  | { readonly TimeSlicedSurveyStartCollecting: SignedTimeSlicedSurveyStartCollectingMessage }
+  | { readonly TimeSlicedSurveyStopCollecting: SignedTimeSlicedSurveyStopCollectingMessage }
+  | { readonly GetScpQuorumset: Uint256 }
+  | { readonly ScpQuorumset: SCPQuorumSet }
+  | { readonly ScpMessage: SCPEnvelope }
+  | { readonly GetScpState: Uint32 }
+  | { readonly SendMore: SendMore }
+  | { readonly SendMoreExtended: SendMoreExtended }
+  | { readonly FloodAdvert: FloodAdvert }
+  | { readonly FloodDemand: FloodDemand }
 ;
 
 export const StellarMessage: XdrCodec<StellarMessage> = taggedUnion({
@@ -5460,7 +5460,7 @@ export const AuthenticatedMessageV0: XdrCodec<AuthenticatedMessageV0> = xdrStruc
 ]);
 
 export type AuthenticatedMessage =
-  | { readonly tag: 0; readonly value: AuthenticatedMessageV0 }
+  | { readonly '0': AuthenticatedMessageV0 }
 ;
 
 export const AuthenticatedMessage: XdrCodec<AuthenticatedMessage> = taggedUnion({
@@ -5524,10 +5524,10 @@ export const HashIDPreimageSorobanAuthorization: XdrCodec<HashIDPreimageSorobanA
 ]);
 
 export type HashIDPreimage =
-  | { readonly tag: 'OpId'; readonly value: HashIDPreimageOperationID }
-  | { readonly tag: 'PoolRevokeOpId'; readonly value: HashIDPreimageRevokeID }
-  | { readonly tag: 'ContractId'; readonly value: HashIDPreimageContractID }
-  | { readonly tag: 'SorobanAuthorization'; readonly value: HashIDPreimageSorobanAuthorization }
+  | { readonly OpId: HashIDPreimageOperationID }
+  | { readonly PoolRevokeOpId: HashIDPreimageRevokeID }
+  | { readonly ContractId: HashIDPreimageContractID }
+  | { readonly SorobanAuthorization: HashIDPreimageSorobanAuthorization }
 ;
 
 export const HashIDPreimage: XdrCodec<HashIDPreimage> = taggedUnion({
@@ -5541,8 +5541,8 @@ export const HashIDPreimage: XdrCodec<HashIDPreimage> = taggedUnion({
 }) as XdrCodec<HashIDPreimage>;
 
 export type TransactionSignaturePayloadTaggedTransaction =
-  | { readonly tag: 'Tx'; readonly value: Transaction }
-  | { readonly tag: 'TxFeeBump'; readonly value: FeeBumpTransaction }
+  | { readonly Tx: Transaction }
+  | { readonly TxFeeBump: FeeBumpTransaction }
 ;
 
 export const TransactionSignaturePayloadTaggedTransaction: XdrCodec<TransactionSignaturePayloadTaggedTransaction> = taggedUnion({

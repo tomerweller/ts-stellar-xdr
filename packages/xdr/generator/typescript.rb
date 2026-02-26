@@ -302,28 +302,35 @@ module Xdrgen
         resolved_disc = resolve_through_typedefs(disc_defn)
         is_enum = resolved_disc.is_a?(AST::Definitions::Enum)
 
-        # ---- Type alias ----
+        # ---- Type alias (externally-tagged) ----
         @out.puts "export type #{ts} ="
 
         union.normal_arms.each do |arm|
           arm.cases.each do |kase|
             tag = render_tag(kase, union, is_enum, resolved_disc)
             if arm.void?
-              @out.puts "  | { readonly tag: #{tag} }"
+              @out.puts "  | #{tag}"
             else
               arm_ts = arm_ts_type(arm, ts)
-              @out.puts "  | { readonly tag: #{tag}; readonly value: #{arm_ts} }"
+              @out.puts "  | { readonly #{unquote(tag)}: #{arm_ts} }"
             end
           end
         end
 
         if union.default_arm.present?
-          dtag = is_enum ? "string" : "number"
           if union.default_arm.void?
-            @out.puts "  | { readonly tag: #{dtag} }"
+            if is_enum
+              @out.puts "  | string"
+            else
+              @out.puts "  | number"
+            end
           else
             arm_ts = ts_type_ref(union.default_arm.declaration)
-            @out.puts "  | { readonly tag: #{dtag}; readonly value: #{arm_ts} }"
+            if is_enum
+              @out.puts "  | { readonly [key: string]: #{arm_ts} }"
+            else
+              @out.puts "  | { readonly [key: number]: #{arm_ts} }"
+            end
           end
         end
 
@@ -610,6 +617,15 @@ module Xdrgen
         pascal = to_pascal_case(str)
         return str if pascal.empty?
         pascal[0].downcase + pascal[1..]
+      end
+
+      # Strip surrounding quotes from a string like "'Foo'" → "Foo" or "0" → "0"
+      def unquote(s)
+        if s.start_with?("'") && s.end_with?("'")
+          s[1..-2]
+        else
+          s
+        end
       end
     end
   end
