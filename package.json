@@ -1,17 +1,10 @@
 {
   "name": "ts-stellar-xdr",
-  "version": "0.1.0",
+  "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
+  "workspaces": ["packages/*"],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build -w packages/strkey && npm run build -w packages/xdr",
     "test": "vitest run"
   },
   "devDependencies": {

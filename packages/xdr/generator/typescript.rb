@@ -214,7 +214,7 @@ module Xdrgen
         @out.puts "  xdrStruct,"
         @out.puts "  xdrEnum,"
         @out.puts "  taggedUnion,"
-        @out.puts "} from 'ts-stellar-xdr';"
+        @out.puts "} from '../src/index.js';"
         @out.puts ""
       end
 
@@ -432,7 +432,7 @@ module Xdrgen
         when AST::Declarations::String
           "string"
         when AST::Declarations::Optional
-          "#{ts_base_type(decl.type)} | undefined"
+          "#{ts_base_type(decl.type)} | null"
         when AST::Declarations::Array
           "readonly #{ts_base_type(decl.type)}[]"
         when AST::Declarations::Simple

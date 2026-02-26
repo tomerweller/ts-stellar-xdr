@@ -21,7 +21,7 @@ import {
   xdrStruct,
   xdrEnum,
   taggedUnion,
-} from 'ts-stellar-xdr';
+} from '../src/index.js';
 
 export type Uint32 = number;
 export const Uint32: XdrCodec<Uint32> = uint32;
@@ -3674,7 +3674,7 @@ export const Liabilities: XdrCodec<Liabilities> = xdrStruct<Liabilities>([
   ['selling', Int64],
 ]);
 
-export type SponsorshipDescriptor = AccountID | undefined;
+export type SponsorshipDescriptor = AccountID | null;
 export const SponsorshipDescriptor: XdrCodec<SponsorshipDescriptor> = option(AccountID);
 
 export interface AccountEntryExtensionV3 {

@@ -12,7 +12,7 @@ import {
   decodeStrkey,
   STRKEY_ED25519_PUBLIC,
   STRKEY_MUXED_ED25519,
-} from './strkey.js';
+} from '@stellar/strkey';
 
 // ---- PublicKey / AccountId ----
 
