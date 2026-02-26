@@ -12,7 +12,15 @@ Modern TypeScript replacement for Stellar's official JS library stack. Zero runt
 | [`@stellar/xdr`](./packages/xdr/) | XDR codec library with auto-generated Stellar types | `@stellar/strkey` |
 | [`@stellar/tx-builder`](./packages/tx-builder/) | Transaction building, signing, keypairs | `@stellar/xdr` |
 | [`@stellar/rpc-client`](./packages/rpc-client/) | JSON-RPC client for Soroban RPC | `@stellar/xdr` |
+| [`@stellar/horizon-client`](./packages/horizon-client/) | REST client for Horizon API | `@stellar/xdr` |
 | [`@stellar/friendbot-client`](./packages/friendbot-client/) | Friendbot faucet client | none |
+
+### Compatibility Layers
+
+Drop-in replacements that wrap the modern packages above to match the official JS SDK API surface. Useful for migrating existing codebases.
+
+| Package | Description | Dependencies |
+|---|---|---|
 | [`@stellar/stellar-base-comp`](./packages/stellar-base-comp/) | Compatibility layer for `@stellar/stellar-base` | `@stellar/tx-builder`, `@noble/hashes` |
 | [`@stellar/stellar-sdk-comp`](./packages/stellar-sdk-comp/) | Compatibility layer for `@stellar/stellar-sdk` | `stellar-base-comp`, `@stellar/rpc-client` |
 
@@ -20,7 +28,7 @@ Modern TypeScript replacement for Stellar's official JS library stack. Zero runt
 
 ```bash
 npm install        # install deps + workspace symlinks
-npm run build      # build all packages (strkey → xdr → tx-builder → rpc-client → friendbot-client)
+npm run build      # build all packages in dependency order
 npm test           # run all tests
 ```
 
@@ -59,6 +67,27 @@ const result = await rpc.sendTransaction(tx.toTransactionEnvelope());
 const confirmed = await rpc.pollTransaction(result.hash);
 ```
 
+### Query Horizon
+
+```typescript
+import { HorizonClient, native, credit } from '@stellar/horizon-client';
+
+const horizon = new HorizonClient('https://horizon.stellar.org');
+
+// Fetch account balances
+const account = await horizon.getAccount('G...');
+console.log(account.balances);
+
+// Browse recent transactions
+const txs = await horizon.getTransactions({ limit: 10, order: 'desc' });
+
+// Query the order book
+const orderBook = await horizon.getOrderBook({
+  selling: native(),
+  buying: credit('USDC', 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'),
+});
+```
+
 ## Key Differences vs Official Stellar JS SDK
 
 | Aspect | Official JS | This Project |
@@ -84,6 +113,7 @@ This project replaces the following packages from Stellar's official JS stack:
 - [`@stellar/js-xdr`](https://github.com/stellar/js-xdr) → `@stellar/xdr`
 - [`@stellar/stellar-base`](https://github.com/stellar/js-stellar-base) → `@stellar/tx-builder`
 - [`@stellar/stellar-sdk`](https://github.com/stellar/js-stellar-sdk) (Soroban RPC) → `@stellar/rpc-client`
+- [`@stellar/stellar-sdk`](https://github.com/stellar/js-stellar-sdk) (Horizon) → `@stellar/horizon-client`
 
 ## Project Structure
 
@@ -93,6 +123,7 @@ packages/
   xdr/              # XDR codecs, generated Stellar types, code generator
   tx-builder/       # transactions, operations, keypairs, signing
   rpc-client/       # Soroban RPC JSON-RPC client
+  horizon-client/   # Horizon REST API client
   friendbot-client/ # Friendbot faucet client
 ```
 
