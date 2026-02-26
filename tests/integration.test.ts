@@ -317,5 +317,48 @@ describe('integration', () => {
         );
       }
     });
+
+    it('string escaping flows through struct and union JSON', () => {
+      // Memo-like union with a string arm containing non-ASCII
+      const MemoType = xdrEnum({ none: 0, text: 1 });
+      type Memo = 'none' | { readonly text: string };
+      const Memo = taggedUnion({
+        switchOn: MemoType,
+        arms: [
+          { tags: ['none'] },
+          { tags: ['text'], codec: xdrString(100) },
+        ],
+      }) as XdrCodec<Memo>;
+
+      // Struct containing the union
+      interface Envelope {
+        readonly memo: Memo;
+        readonly label: string;
+      }
+      const Label = xdrString(100);
+      const Envelope = xdrStruct<Envelope>([
+        ['memo', Memo],
+        ['label', Label],
+      ]);
+
+      const val: Envelope = {
+        memo: { text: 'héllo' },
+        label: 'café',
+      };
+
+      // Verify JSON value has escaped strings
+      const jsonVal = Envelope.toJsonValue(val) as any;
+      expect(jsonVal.memo.text).toBe('h\\xc3\\xa9llo');
+      expect(jsonVal.label).toBe('caf\\xc3\\xa9');
+
+      // Full roundtrip
+      const json = Envelope.toJson(val);
+      const restored = Envelope.fromJson(json);
+      expect(is(restored.memo, 'text')).toBe(true);
+      if (is(restored.memo, 'text')) {
+        expect(restored.memo.text).toBe('héllo');
+      }
+      expect(restored.label).toBe('café');
+    });
   });
 });
