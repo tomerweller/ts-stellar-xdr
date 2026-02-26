@@ -1,0 +1,23 @@
+{
+  "name": "@stellar/stellar-sdk-comp",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@stellar/stellar-base-comp": "*",
+    "@stellar/rpc-client": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

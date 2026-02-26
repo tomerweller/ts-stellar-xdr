@@ -13,6 +13,8 @@ Modern TypeScript replacement for Stellar's official JS library stack. Zero runt
 | [`@stellar/tx-builder`](./packages/tx-builder/) | Transaction building, signing, keypairs | `@stellar/xdr` |
 | [`@stellar/rpc-client`](./packages/rpc-client/) | JSON-RPC client for Soroban RPC | `@stellar/xdr` |
 | [`@stellar/friendbot-client`](./packages/friendbot-client/) | Friendbot faucet client | none |
+| [`@stellar/stellar-base-comp`](./packages/stellar-base-comp/) | Compatibility layer for `@stellar/stellar-base` | `@stellar/tx-builder`, `@noble/hashes` |
+| [`@stellar/stellar-sdk-comp`](./packages/stellar-sdk-comp/) | Compatibility layer for `@stellar/stellar-sdk` | `stellar-base-comp`, `@stellar/rpc-client` |
 
 ## Quick Start
 
