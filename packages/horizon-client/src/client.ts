@@ -3,10 +3,14 @@ import { TransactionEnvelope as TransactionEnvelopeCodec } from '@stellar/xdr';
 import { HorizonError } from './errors.js';
 import { httpGet, httpPost } from './transport.js';
 import { assetParams, assetString, assetList } from './assets.js';
+import type { AssetId } from './assets.js';
 import { parsePage, stripLinks, type HalCollection } from './parsers.js';
+import { sseStream } from './streaming.js';
 import type {
   PageParams,
   Page,
+  Stream,
+  StreamOptions,
   RootResponse,
   FeeStatsResponse,
   AccountRecord,
@@ -639,5 +643,93 @@ export class HorizonClient {
       'transactions_async',
       `tx=${encodeURIComponent(xdr)}`,
     );
+  }
+
+  // -----------------------------------------------------------------------
+  // Streaming (SSE)
+  // -----------------------------------------------------------------------
+
+  private openStream<T>(
+    path: string,
+    params: Record<string, string>,
+    opts: StreamOptions<T>,
+  ): Stream {
+    return sseStream(this.url, path, params, this.headers, opts);
+  }
+
+  streamLedgers(opts: StreamOptions<LedgerRecord>): Stream {
+    return this.openStream('ledgers', {}, opts);
+  }
+
+  streamTransactions(opts: StreamOptions<TransactionRecord>): Stream {
+    return this.openStream('transactions', {}, opts);
+  }
+
+  streamOperations(opts: StreamOptions<OperationRecord>): Stream {
+    return this.openStream('operations', {}, opts);
+  }
+
+  streamPayments(opts: StreamOptions<OperationRecord>): Stream {
+    return this.openStream('payments', {}, opts);
+  }
+
+  streamEffects(opts: StreamOptions<EffectRecord>): Stream {
+    return this.openStream('effects', {}, opts);
+  }
+
+  streamTrades(opts: StreamOptions<TradeRecord>): Stream {
+    return this.openStream('trades', {}, opts);
+  }
+
+  streamAccountTransactions(
+    accountId: string,
+    opts: StreamOptions<TransactionRecord>,
+  ): Stream {
+    return this.openStream(`accounts/${accountId}/transactions`, {}, opts);
+  }
+
+  streamAccountOperations(
+    accountId: string,
+    opts: StreamOptions<OperationRecord>,
+  ): Stream {
+    return this.openStream(`accounts/${accountId}/operations`, {}, opts);
+  }
+
+  streamAccountPayments(
+    accountId: string,
+    opts: StreamOptions<OperationRecord>,
+  ): Stream {
+    return this.openStream(`accounts/${accountId}/payments`, {}, opts);
+  }
+
+  streamAccountEffects(
+    accountId: string,
+    opts: StreamOptions<EffectRecord>,
+  ): Stream {
+    return this.openStream(`accounts/${accountId}/effects`, {}, opts);
+  }
+
+  streamAccountTrades(
+    accountId: string,
+    opts: StreamOptions<TradeRecord>,
+  ): Stream {
+    return this.openStream(`accounts/${accountId}/trades`, {}, opts);
+  }
+
+  streamAccountOffers(
+    accountId: string,
+    opts: StreamOptions<OfferRecord>,
+  ): Stream {
+    return this.openStream(`accounts/${accountId}/offers`, {}, opts);
+  }
+
+  streamOrderBook(
+    params: { selling: AssetId; buying: AssetId },
+    opts: StreamOptions<OrderBookResponse>,
+  ): Stream {
+    return this.openStream('order_book', {
+      ...assetParams('selling', params.selling),
+      ...assetParams('buying', params.buying),
+    }, opts);
   }
 }

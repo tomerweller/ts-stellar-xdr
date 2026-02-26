@@ -10,11 +10,17 @@ export { type AssetId, native, credit, assetParams, assetString, assetList } fro
 // XDR decode helpers
 export { decodeEnvelopeXdr, decodeResultXdr, decodeResultMetaXdr } from './parsers.js';
 
+// Streaming
+export { parseSSE, sseStream } from './streaming.js';
+
 // All types
 export type {
   // Pagination
   PageParams,
   Page,
+  // Streaming
+  Stream,
+  StreamOptions,
   // Common
   AssetType,
   PriceR,

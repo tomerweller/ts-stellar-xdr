@@ -584,3 +584,17 @@ export interface OrderBookParams {
   buying: AssetId;
   limit?: number;
 }
+
+// ---------------------------------------------------------------------------
+// Streaming (SSE)
+// ---------------------------------------------------------------------------
+
+export interface StreamOptions<T> {
+  cursor?: string;
+  onMessage: (record: T) => void;
+  onError?: (error: Error) => void;
+}
+
+export interface Stream {
+  close(): void;
+}
