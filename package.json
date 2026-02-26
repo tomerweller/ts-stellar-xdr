@@ -1,5 +1,6 @@
 {
   "name": "ts-stellar-sdk",
+  "description": "EXPERIMENTAL — Modern TypeScript replacement for Stellar's JS SDK. Not for production use.",
   "private": true,
   "type": "module",
   "workspaces": ["packages/*"],

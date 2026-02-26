@@ -1,5 +1,7 @@
 # ts-stellar-sdk
 
+> **WARNING: This is an experimental project. It is not audited, not officially supported, and should not be used in production.**
+
 Modern TypeScript replacement for Stellar's official JS library stack. Zero runtime dependencies, fully type-safe, ESM only.
 
 ## Packages
