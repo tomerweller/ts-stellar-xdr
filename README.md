@@ -1,49 +1,77 @@
-# ts-stellar-xdr
+# ts-stellar-sdk
 
 Modern TypeScript replacement for Stellar's official JS library stack. Zero runtime dependencies, fully type-safe, ESM only.
 
 ## Packages
 
-| Package | Description | Dependencies | Status |
-|---|---|---|---|
-| [`@stellar/strkey`](./packages/strkey/) | Stellar address encoding (Base32 + CRC16-XModem) | none | done |
-| [`@stellar/xdr`](./packages/xdr/) | XDR codec library with auto-generated Stellar types | `@stellar/strkey` | done |
-| [`@stellar/tx-builder`](./packages/tx-builder/) | Transaction building, signing, keypairs | `@stellar/xdr` | done |
-| [`@stellar/rpc-client`](./packages/rpc-client/) | JSON-RPC client for Soroban RPC | `@stellar/xdr` | done |
-| [`@stellar/friendbot-client`](./packages/friendbot-client/) | Friendbot faucet client | none | done |
-
-## Key Differences vs Official Stellar JS SDK
-
-| Aspect | Official JS (`stellar-sdk`) | This Project |
+| Package | Description | Dependencies |
 |---|---|---|
-| **Structs** | Class instances with `_attributes`, getter methods | Plain readonly objects |
-| **Enums** | Enum instances with `.name`/`.value` | String literals (`'native'`) |
-| **64-bit ints** | Custom `Hyper`/`UnsignedHyper` classes | Native `bigint` |
-| **Unions** | `.switch()`, `.arm()`, `.value()` methods | Externally-tagged: `{ armName: value }` |
-| **JSON** | Not supported in js-xdr | SEP-0051 aligned `toJson()`/`fromJson()` |
-| **Optionals** | `null` / instance | `T \| null` |
-| **Validation** | `instanceof` checks | Structural typing |
-| **Dependencies** | Runtime dependencies | Zero runtime dependencies |
-| **Module format** | CommonJS + ESM | ESM only |
+| [`@stellar/strkey`](./packages/strkey/) | Stellar address encoding (Base32 + CRC16-XModem) | none |
+| [`@stellar/xdr`](./packages/xdr/) | XDR codec library with auto-generated Stellar types | `@stellar/strkey` |
+| [`@stellar/tx-builder`](./packages/tx-builder/) | Transaction building, signing, keypairs | `@stellar/xdr` |
+| [`@stellar/rpc-client`](./packages/rpc-client/) | JSON-RPC client for Soroban RPC | `@stellar/xdr` |
+| [`@stellar/friendbot-client`](./packages/friendbot-client/) | Friendbot faucet client | none |
 
 ## Quick Start
 
 ```bash
 npm install        # install deps + workspace symlinks
 npm run build      # build all packages (strkey → xdr → tx-builder → rpc-client → friendbot-client)
-npm test           # run all 614 tests
+npm test           # run all tests
 ```
 
 Requires Node.js >= 18.
 
+## Example
+
+```typescript
+import { Keypair, TransactionBuilder, Networks, createAccount } from '@stellar/tx-builder';
+import { RpcClient } from '@stellar/rpc-client';
+import { FriendbotClient } from '@stellar/friendbot-client';
+
+// Create keypairs
+const alice = await Keypair.random();
+const bob = await Keypair.random();
+
+// Fund alice on testnet
+const friendbot = new FriendbotClient('https://friendbot.stellar.org');
+await friendbot.fund(alice.publicKey);
+
+// Fetch alice's sequence number
+const rpc = new RpcClient('https://soroban-testnet.stellar.org');
+const account = await rpc.getAccount(alice.publicKey);
+
+// Build, sign, and submit a CreateAccount transaction
+const tx = await new TransactionBuilder(
+  { address: alice.publicKey, sequenceNumber: account.seqNum },
+  { fee: 100, networkPassphrase: Networks.TESTNET },
+)
+  .setTimeout(300)
+  .addOperation(createAccount({ destination: bob.publicKey, startingBalance: 100_0000000n }))
+  .build();
+
+await tx.sign(alice);
+const result = await rpc.sendTransaction(tx.toTransactionEnvelope());
+const confirmed = await rpc.pollTransaction(result.hash);
+```
+
+## Key Differences vs Official Stellar JS SDK
+
+| Aspect | Official JS | This Project |
+|---|---|---|
+| **Data model** | Class instances with getters | Plain readonly objects |
+| **64-bit ints** | Custom `Hyper`/`UnsignedHyper` classes | Native `bigint` |
+| **Dependencies** | Runtime dependencies | Zero runtime dependencies |
+| **Module format** | CommonJS + ESM | ESM only |
+
+See the [`@stellar/xdr` README](./packages/xdr/) for a detailed comparison of XDR type representations.
+
 ## Design Principles
 
-1. **Type safety first** — leverage TypeScript's type system for compile-time correctness. Externally-tagged unions, string-literal enums, and readonly interfaces.
-2. **SEP-0051 alignment** — JSON serialization follows the Stellar ecosystem standard.
-3. **Zero runtime dependencies** — no production dependencies across all packages.
-4. **Codec composability** — small, composable codec building blocks that combine to represent any XDR schema.
-5. **Correctness** — strict validation of values, padding, and limits. Cross-verified against `rs-stellar-xdr` and `rs-stellar-strkey`.
-6. **Simplicity** — minimal API surface. One way to do things.
+1. **Type safety first** — leverage TypeScript's type system for compile-time correctness.
+2. **Zero runtime dependencies** — no production dependencies across all packages.
+3. **Correctness** — strict validation, cross-verified against Rust reference implementations.
+4. **Simplicity** — minimal API surface. One way to do things.
 
 ## Replaces
 
@@ -57,9 +85,9 @@ This project replaces the following packages from Stellar's official JS stack:
 
 ```
 packages/
-  strkey/       # standalone address encoding, zero deps
-  xdr/          # XDR codecs, generated Stellar types, code generator
-  tx-builder/   # transactions, operations, keypairs, signing
+  strkey/           # standalone address encoding, zero deps
+  xdr/              # XDR codecs, generated Stellar types, code generator
+  tx-builder/       # transactions, operations, keypairs, signing
   rpc-client/       # Soroban RPC JSON-RPC client
   friendbot-client/ # Friendbot faucet client
 ```

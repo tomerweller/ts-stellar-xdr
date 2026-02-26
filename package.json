@@ -1,5 +1,5 @@
 {
-  "name": "ts-stellar-xdr",
+  "name": "ts-stellar-sdk",
   "private": true,
   "type": "module",
   "workspaces": ["packages/*"],
