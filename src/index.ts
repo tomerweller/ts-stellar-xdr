@@ -49,4 +49,8 @@ export {
   stellarMuxedAccount,
   stellarAssetCode4,
   stellarAssetCode12,
+  stellarInt128,
+  stellarUint128,
+  stellarInt256,
+  stellarUint256,
 } from './stellar.js';

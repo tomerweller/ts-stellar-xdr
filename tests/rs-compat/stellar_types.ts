@@ -28,6 +28,10 @@ import {
   stellarMuxedAccount,
   stellarAssetCode4,
   stellarAssetCode12,
+  stellarInt128,
+  stellarUint128,
+  stellarInt256,
+  stellarUint256,
 } from '../../src/index.js';
 
 // ============================================================
@@ -405,3 +409,59 @@ export const TransactionEnvelope: XdrCodec<TransactionEnvelope> = taggedUnion({
 
 export type Uint32 = number;
 export const Uint32: XdrCodec<Uint32> = uint32;
+
+// ============================================================
+// 128-bit / 256-bit integer parts
+// ============================================================
+
+export interface Int128Parts {
+  readonly hi: bigint;
+  readonly lo: bigint;
+}
+export const Int128Parts: XdrCodec<Int128Parts> = stellarInt128(
+  xdrStruct<Int128Parts>([
+    ['hi', int64],
+    ['lo', uint64],
+  ]),
+);
+
+export interface UInt128Parts {
+  readonly hi: bigint;
+  readonly lo: bigint;
+}
+export const UInt128Parts: XdrCodec<UInt128Parts> = stellarUint128(
+  xdrStruct<UInt128Parts>([
+    ['hi', uint64],
+    ['lo', uint64],
+  ]),
+);
+
+export interface Int256Parts {
+  readonly hiHi: bigint;
+  readonly hiLo: bigint;
+  readonly loHi: bigint;
+  readonly loLo: bigint;
+}
+export const Int256Parts: XdrCodec<Int256Parts> = stellarInt256(
+  xdrStruct<Int256Parts>([
+    ['hiHi', int64],
+    ['hiLo', uint64],
+    ['loHi', uint64],
+    ['loLo', uint64],
+  ]),
+);
+
+export interface UInt256Parts {
+  readonly hiHi: bigint;
+  readonly hiLo: bigint;
+  readonly loHi: bigint;
+  readonly loLo: bigint;
+}
+export const UInt256Parts: XdrCodec<UInt256Parts> = stellarUint256(
+  xdrStruct<UInt256Parts>([
+    ['hiHi', uint64],
+    ['hiLo', uint64],
+    ['loHi', uint64],
+    ['loLo', uint64],
+  ]),
+);

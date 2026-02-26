@@ -178,3 +178,150 @@ export function stellarAssetCode12<T>(codec: XdrCodec<T>): XdrCodec<T> {
     },
   });
 }
+
+// ---- 128-bit / 256-bit integer parts ----
+
+const U64_MASK = (1n << 64n) - 1n;
+
+/**
+ * Wraps an Int128Parts struct codec so JSON produces a decimal string.
+ *
+ *   toJsonValue({ hi: 1n, lo: 2n }) → "18446744073709551618"
+ *   fromJsonValue("18446744073709551618") → { hi: 1n, lo: 2n }
+ *   fromJsonValue({ hi: "1", lo: "2" }) → { hi: 1n, lo: 2n }  (dual deser)
+ */
+export function stellarInt128<T>(codec: XdrCodec<T>): XdrCodec<T> {
+  const MIN = -(1n << 127n);
+  const MAX = (1n << 127n) - 1n;
+  return jsonAs(codec, {
+    toJsonValue(value: T): unknown {
+      const v = value as { readonly hi: bigint; readonly lo: bigint };
+      const combined = (v.hi << 64n) | BigInt.asUintN(64, v.lo);
+      return String(combined);
+    },
+    fromJsonValue(json: unknown): T {
+      if (typeof json === 'string') {
+        const value = BigInt(json);
+        if (value < MIN || value > MAX) {
+          throw new Error(`Int128 value out of range: ${json}`);
+        }
+        return {
+          hi: value >> 64n,
+          lo: BigInt.asUintN(64, value),
+        } as T;
+      }
+      return codec.fromJsonValue(json);
+    },
+  });
+}
+
+/**
+ * Wraps a UInt128Parts struct codec so JSON produces a decimal string.
+ *
+ *   toJsonValue({ hi: 0n, lo: 1n }) → "1"
+ *   fromJsonValue("1") → { hi: 0n, lo: 1n }
+ */
+export function stellarUint128<T>(codec: XdrCodec<T>): XdrCodec<T> {
+  const MAX = (1n << 128n) - 1n;
+  return jsonAs(codec, {
+    toJsonValue(value: T): unknown {
+      const v = value as { readonly hi: bigint; readonly lo: bigint };
+      const combined = (BigInt.asUintN(64, v.hi) << 64n) | BigInt.asUintN(64, v.lo);
+      return String(combined);
+    },
+    fromJsonValue(json: unknown): T {
+      if (typeof json === 'string') {
+        const value = BigInt(json);
+        if (value < 0n || value > MAX) {
+          throw new Error(`UInt128 value out of range: ${json}`);
+        }
+        return {
+          hi: (value >> 64n) & U64_MASK,
+          lo: value & U64_MASK,
+        } as T;
+      }
+      return codec.fromJsonValue(json);
+    },
+  });
+}
+
+/**
+ * Wraps an Int256Parts struct codec so JSON produces a decimal string.
+ *
+ *   toJsonValue({ hiHi: 0n, hiLo: 0n, loHi: 0n, loLo: 1n }) → "1"
+ */
+export function stellarInt256<T>(codec: XdrCodec<T>): XdrCodec<T> {
+  const MIN = -(1n << 255n);
+  const MAX = (1n << 255n) - 1n;
+  return jsonAs(codec, {
+    toJsonValue(value: T): unknown {
+      const v = value as {
+        readonly hiHi: bigint;
+        readonly hiLo: bigint;
+        readonly loHi: bigint;
+        readonly loLo: bigint;
+      };
+      const combined =
+        (v.hiHi << 192n) |
+        (BigInt.asUintN(64, v.hiLo) << 128n) |
+        (BigInt.asUintN(64, v.loHi) << 64n) |
+        BigInt.asUintN(64, v.loLo);
+      return String(combined);
+    },
+    fromJsonValue(json: unknown): T {
+      if (typeof json === 'string') {
+        const value = BigInt(json);
+        if (value < MIN || value > MAX) {
+          throw new Error(`Int256 value out of range: ${json}`);
+        }
+        return {
+          hiHi: value >> 192n,
+          hiLo: BigInt.asUintN(64, value >> 128n),
+          loHi: BigInt.asUintN(64, value >> 64n),
+          loLo: BigInt.asUintN(64, value),
+        } as T;
+      }
+      return codec.fromJsonValue(json);
+    },
+  });
+}
+
+/**
+ * Wraps a UInt256Parts struct codec so JSON produces a decimal string.
+ *
+ *   toJsonValue({ hiHi: 0n, hiLo: 0n, loHi: 0n, loLo: 1n }) → "1"
+ */
+export function stellarUint256<T>(codec: XdrCodec<T>): XdrCodec<T> {
+  const MAX = (1n << 256n) - 1n;
+  return jsonAs(codec, {
+    toJsonValue(value: T): unknown {
+      const v = value as {
+        readonly hiHi: bigint;
+        readonly hiLo: bigint;
+        readonly loHi: bigint;
+        readonly loLo: bigint;
+      };
+      const combined =
+        (BigInt.asUintN(64, v.hiHi) << 192n) |
+        (BigInt.asUintN(64, v.hiLo) << 128n) |
+        (BigInt.asUintN(64, v.loHi) << 64n) |
+        BigInt.asUintN(64, v.loLo);
+      return String(combined);
+    },
+    fromJsonValue(json: unknown): T {
+      if (typeof json === 'string') {
+        const value = BigInt(json);
+        if (value < 0n || value > MAX) {
+          throw new Error(`UInt256 value out of range: ${json}`);
+        }
+        return {
+          hiHi: (value >> 192n) & U64_MASK,
+          hiLo: (value >> 128n) & U64_MASK,
+          loHi: (value >> 64n) & U64_MASK,
+          loLo: value & U64_MASK,
+        } as T;
+      }
+      return codec.fromJsonValue(json);
+    },
+  });
+}

@@ -40,6 +40,10 @@ import {
   SequenceNumber,
   Int64,
   DecoratedSignature,
+  Int128Parts,
+  UInt128Parts,
+  Int256Parts,
+  UInt256Parts,
 } from './stellar_types.js';
 import {
   TX_SMALL_BYTES,
@@ -466,5 +470,162 @@ describe('PublicKey / MuxedAccount JSON', () => {
     const xdr = PublicKey.toXdr(value);
     const fromXdr = PublicKey.fromXdr(xdr);
     expect(PublicKey.toJsonValue(fromXdr)).toEqual(json);
+  });
+});
+
+// ============================================================
+// 128-bit and 256-bit integer JSON
+// ============================================================
+
+describe('128-bit and 256-bit integer JSON', () => {
+  // ---- Int128Parts ----
+
+  it('Int128Parts { hi: 1, lo: 2 } → "18446744073709551618"', () => {
+    const value: Int128Parts = { hi: 1n, lo: 2n };
+    expect(Int128Parts.toJsonValue(value)).toBe('18446744073709551618');
+  });
+
+  it('Int128Parts string roundtrip', () => {
+    const value: Int128Parts = { hi: 1n, lo: 2n };
+    const json = Int128Parts.toJsonValue(value) as string;
+    const roundtripped = Int128Parts.fromJsonValue(json);
+    expect(roundtripped).toEqual(value);
+  });
+
+  it('Int128Parts dual deser: object format accepted', () => {
+    const roundtripped = Int128Parts.fromJsonValue({ hi: '1', lo: '2' });
+    expect(roundtripped).toEqual({ hi: 1n, lo: 2n });
+  });
+
+  it('Int128Parts { hi: 0, lo: 0 } → "0"', () => {
+    expect(Int128Parts.toJsonValue({ hi: 0n, lo: 0n })).toBe('0');
+  });
+
+  it('Int128Parts { hi: -1, lo: 0 } → negative value', () => {
+    const value: Int128Parts = { hi: -1n, lo: 0n };
+    // -1 << 64 = -18446744073709551616
+    expect(Int128Parts.toJsonValue(value)).toBe('-18446744073709551616');
+    const roundtripped = Int128Parts.fromJsonValue('-18446744073709551616');
+    expect(roundtripped).toEqual(value);
+  });
+
+  it('Int128Parts min = -2^127', () => {
+    const min = -(1n << 127n);
+    const json = Int128Parts.fromJsonValue(String(min));
+    expect(Int128Parts.toJsonValue(json)).toBe(String(min));
+  });
+
+  it('Int128Parts max = 2^127 - 1', () => {
+    const max = (1n << 127n) - 1n;
+    const json = Int128Parts.fromJsonValue(String(max));
+    expect(Int128Parts.toJsonValue(json)).toBe(String(max));
+  });
+
+  // ---- UInt128Parts ----
+
+  it('UInt128Parts { hi: 0, lo: 1 } → "1"', () => {
+    expect(UInt128Parts.toJsonValue({ hi: 0n, lo: 1n })).toBe('1');
+  });
+
+  it('UInt128Parts max = 2^128 - 1', () => {
+    const max = (1n << 128n) - 1n;
+    const json = UInt128Parts.fromJsonValue(String(max));
+    expect(UInt128Parts.toJsonValue(json)).toBe(String(max));
+  });
+
+  it('UInt128Parts string roundtrip', () => {
+    const value: UInt128Parts = { hi: 123n, lo: 456n };
+    const json = UInt128Parts.toJsonValue(value) as string;
+    const roundtripped = UInt128Parts.fromJsonValue(json);
+    expect(roundtripped).toEqual(value);
+  });
+
+  // ---- Int256Parts ----
+
+  it('Int256Parts { hiHi: 0, hiLo: 0, loHi: 0, loLo: 1 } → "1"', () => {
+    expect(Int256Parts.toJsonValue({ hiHi: 0n, hiLo: 0n, loHi: 0n, loLo: 1n })).toBe('1');
+  });
+
+  it('Int256Parts with hiHi=1 → large number', () => {
+    const value: Int256Parts = { hiHi: 1n, hiLo: 0n, loHi: 0n, loLo: 0n };
+    const expected = String(1n << 192n);
+    expect(Int256Parts.toJsonValue(value)).toBe(expected);
+    const roundtripped = Int256Parts.fromJsonValue(expected);
+    expect(roundtripped).toEqual(value);
+  });
+
+  it('Int256Parts with negative hiHi → negative value', () => {
+    const value: Int256Parts = { hiHi: -1n, hiLo: 0n, loHi: 0n, loLo: 0n };
+    const expected = String(-1n << 192n);
+    expect(Int256Parts.toJsonValue(value)).toBe(expected);
+    const roundtripped = Int256Parts.fromJsonValue(expected);
+    expect(roundtripped).toEqual(value);
+  });
+
+  it('Int256Parts min = -2^255', () => {
+    const min = -(1n << 255n);
+    const json = Int256Parts.fromJsonValue(String(min));
+    expect(Int256Parts.toJsonValue(json)).toBe(String(min));
+  });
+
+  it('Int256Parts max = 2^255 - 1', () => {
+    const max = (1n << 255n) - 1n;
+    const json = Int256Parts.fromJsonValue(String(max));
+    expect(Int256Parts.toJsonValue(json)).toBe(String(max));
+  });
+
+  // ---- UInt256Parts ----
+
+  it('UInt256Parts { hiHi: 0, hiLo: 0, loHi: 0, loLo: 1 } → "1"', () => {
+    expect(UInt256Parts.toJsonValue({ hiHi: 0n, hiLo: 0n, loHi: 0n, loLo: 1n })).toBe('1');
+  });
+
+  it('UInt256Parts with hiHi=1 → large number', () => {
+    const value: UInt256Parts = { hiHi: 1n, hiLo: 0n, loHi: 0n, loLo: 0n };
+    const expected = String(1n << 192n);
+    expect(UInt256Parts.toJsonValue(value)).toBe(expected);
+    const roundtripped = UInt256Parts.fromJsonValue(expected);
+    expect(roundtripped).toEqual(value);
+  });
+
+  it('UInt256Parts max = 2^256 - 1', () => {
+    const max = (1n << 256n) - 1n;
+    const json = UInt256Parts.fromJsonValue(String(max));
+    expect(UInt256Parts.toJsonValue(json)).toBe(String(max));
+  });
+
+  it('UInt256Parts dual deser: object format accepted', () => {
+    const roundtripped = UInt256Parts.fromJsonValue({
+      hiHi: '0', hiLo: '0', loHi: '0', loLo: '42',
+    });
+    expect(roundtripped).toEqual({ hiHi: 0n, hiLo: 0n, loHi: 0n, loLo: 42n });
+  });
+
+  // ---- Range validation ----
+
+  it('Int128 out of range throws', () => {
+    const tooLarge = String((1n << 127n));
+    expect(() => Int128Parts.fromJsonValue(tooLarge)).toThrow('out of range');
+    const tooSmall = String(-(1n << 127n) - 1n);
+    expect(() => Int128Parts.fromJsonValue(tooSmall)).toThrow('out of range');
+  });
+
+  it('UInt128 out of range throws', () => {
+    expect(() => UInt128Parts.fromJsonValue('-1')).toThrow('out of range');
+    const tooLarge = String(1n << 128n);
+    expect(() => UInt128Parts.fromJsonValue(tooLarge)).toThrow('out of range');
+  });
+
+  it('Int256 out of range throws', () => {
+    const tooLarge = String(1n << 255n);
+    expect(() => Int256Parts.fromJsonValue(tooLarge)).toThrow('out of range');
+    const tooSmall = String(-(1n << 255n) - 1n);
+    expect(() => Int256Parts.fromJsonValue(tooSmall)).toThrow('out of range');
+  });
+
+  it('UInt256 out of range throws', () => {
+    expect(() => UInt256Parts.fromJsonValue('-1')).toThrow('out of range');
+    const tooLarge = String(1n << 256n);
+    expect(() => UInt256Parts.fromJsonValue(tooLarge)).toThrow('out of range');
   });
 });
