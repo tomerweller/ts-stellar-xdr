@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@stellar/stellar-base-comp": "*",
-    "@stellar/rpc-client": "*"
+    "@stellar/rpc-client": "*",
+    "@stellar/horizon-client": "*"
   },
   "engines": {
     "node": ">=18"
