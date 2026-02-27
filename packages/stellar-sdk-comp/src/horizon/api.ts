@@ -79,14 +79,20 @@ export class AccountResponse extends Account {
   declare readonly balances: BalanceLine[];
   declare readonly signers: AccountSigner[];
   declare readonly data: Record<string, string>;
+  declare readonly data_attr: Record<string, string>;
   declare readonly paging_token: string;
   declare readonly sponsor?: string;
   declare readonly num_sponsoring: number;
   declare readonly num_sponsored: number;
+  [key: string]: any;
 
   constructor(record: AccountRecord) {
     super(record.account_id, record.sequence);
     Object.assign(this, record);
+    // Alias data as data_attr for compat
+    if (!this.data_attr && this.data) {
+      (this as any).data_attr = this.data;
+    }
   }
 }
 
@@ -102,10 +108,10 @@ export type PaymentPathRecord = import('@stellar/horizon-client').PathRecord;
 // ---------------------------------------------------------------------------
 
 export interface Reserve {
-  asset_type: string;
+  asset_type?: string;
   asset_code?: string;
   asset_issuer?: string;
-  asset?: string;
+  asset: string;
   amount: string;
   [key: string]: any;
 }
@@ -137,33 +143,35 @@ export namespace ErrorResponseData {
 // OperationResponseType — runtime enum matching the official SDK
 // ---------------------------------------------------------------------------
 
-const _OperationResponseType = {
-  createAccount: 'create_account' as const,
-  payment: 'payment' as const,
-  pathPayment: 'path_payment_strict_receive' as const,
-  createPassiveOffer: 'create_passive_sell_offer' as const,
-  manageOffer: 'manage_sell_offer' as const,
-  setOptions: 'set_options' as const,
-  changeTrust: 'change_trust' as const,
-  allowTrust: 'allow_trust' as const,
-  accountMerge: 'account_merge' as const,
-  inflation: 'inflation' as const,
-  manageData: 'manage_data' as const,
-  bumpSequence: 'bump_sequence' as const,
-  manageBuyOffer: 'manage_buy_offer' as const,
-  pathPaymentStrictSend: 'path_payment_strict_send' as const,
-  createClaimableBalance: 'create_claimable_balance' as const,
-  claimClaimableBalance: 'claim_claimable_balance' as const,
-  beginSponsoringFutureReserves: 'begin_sponsoring_future_reserves' as const,
-  endSponsoringFutureReserves: 'end_sponsoring_future_reserves' as const,
-  revokeSponsorship: 'revoke_sponsorship' as const,
-  clawback: 'clawback' as const,
-  clawbackClaimableBalance: 'clawback_claimable_balance' as const,
-  setTrustLineFlags: 'set_trust_line_flags' as const,
-  liquidityPoolDeposit: 'liquidity_pool_deposit' as const,
-  liquidityPoolWithdraw: 'liquidity_pool_withdraw' as const,
-  invokeHostFunction: 'invoke_host_function' as const,
-  bumpFootprintExpiration: 'bump_footprint_expiration' as const,
-  restoreFootprint: 'restore_footprint' as const,
-} as const;
-export const OperationResponseType = _OperationResponseType;
+export const OperationResponseType: { readonly [key: string]: string } = {
+  createAccount: 'create_account',
+  payment: 'payment',
+  pathPayment: 'path_payment_strict_receive',
+  createPassiveOffer: 'create_passive_sell_offer',
+  manageOffer: 'manage_sell_offer',
+  setOptions: 'set_options',
+  changeTrust: 'change_trust',
+  allowTrust: 'allow_trust',
+  accountMerge: 'account_merge',
+  inflation: 'inflation',
+  manageData: 'manage_data',
+  bumpSequence: 'bump_sequence',
+  manageBuyOffer: 'manage_buy_offer',
+  pathPaymentStrictSend: 'path_payment_strict_send',
+  createClaimableBalance: 'create_claimable_balance',
+  claimClaimableBalance: 'claim_claimable_balance',
+  beginSponsoringFutureReserves: 'begin_sponsoring_future_reserves',
+  endSponsoringFutureReserves: 'end_sponsoring_future_reserves',
+  revokeSponsorship: 'revoke_sponsorship',
+  clawback: 'clawback',
+  clawbackClaimableBalance: 'clawback_claimable_balance',
+  setTrustLineFlags: 'set_trust_line_flags',
+  liquidityPoolDeposit: 'liquidity_pool_deposit',
+  liquidityPoolWithdraw: 'liquidity_pool_withdraw',
+  invokeHostFunction: 'invoke_host_function',
+  bumpFootprintExpiration: 'bump_footprint_expiration',
+  extendFootprintTtl: 'extend_footprint_ttl',
+  restoreFootprint: 'restore_footprint',
+};
+// Type includes all OperationType values from horizon-client for compat
+export type OperationResponseType = string;

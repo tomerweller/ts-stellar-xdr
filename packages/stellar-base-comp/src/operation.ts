@@ -45,6 +45,7 @@ import {
 } from '@stellar/xdr';
 import { Asset } from './asset.js';
 import { amountToBigInt, toStroops, fromStroops } from './amount.js';
+import { augmentBuffersDeep } from './signing.js';
 
 function wrap(modernOp: any): any {
   return (CompatOperationXdr as any)._fromModern(modernOp);
@@ -232,7 +233,7 @@ function decodeOperation(op: ModernOperation): any {
     if (op_.medThreshold !== null) result.medThreshold = op_.medThreshold;
     if (op_.highThreshold !== null) result.highThreshold = op_.highThreshold;
     if (op_.homeDomain !== null) result.homeDomain = op_.homeDomain;
-    if (op_.signer !== null) result.signer = op_.signer;
+    if (op_.signer !== null) result.signer = augmentBuffersDeep(op_.signer);
     return result;
   }
 
@@ -391,7 +392,7 @@ function decodeOperation(op: ModernOperation): any {
     const op_ = body.InvokeHostFunction;
     return {
       type: 'invokeHostFunction',
-      func: op_.hostFunction,
+      func: augmentBuffersDeep(op_.hostFunction),
       auth: op_.auth,
       source,
     };

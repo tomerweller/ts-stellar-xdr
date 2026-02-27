@@ -60,7 +60,7 @@ export class Asset {
     return this._code;
   }
 
-  get issuer(): string | undefined {
+  get issuer(): any {
     return this._issuer ?? undefined;
   }
 
@@ -68,7 +68,7 @@ export class Asset {
     return this._code;
   }
 
-  getIssuer(): string | undefined {
+  getIssuer(): any {
     return this._issuer ?? undefined;
   }
 

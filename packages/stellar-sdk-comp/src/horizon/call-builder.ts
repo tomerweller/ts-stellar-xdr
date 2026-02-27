@@ -303,6 +303,11 @@ export class OperationCallBuilder extends CallBuilder<OperationRecord> {
     this._params.include_failed = String(include);
     return this;
   }
+
+  join(param: string): this {
+    this._params.join = param;
+    return this;
+  }
 }
 
 // ---------------------------------------------------------------------------

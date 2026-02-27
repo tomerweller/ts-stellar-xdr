@@ -20,7 +20,7 @@ import {
   STRKEY_ED25519_PUBLIC,
   STRKEY_MUXED_ED25519,
 } from '@stellar/xdr';
-import { hash, networkId } from './signing.js';
+import { hash, networkId, augmentBuffer } from './signing.js';
 import { Memo } from './memo.js';
 import { Operation } from './operation.js';
 import type { Keypair } from './keypair.js';
@@ -62,12 +62,12 @@ function muxedAccountToAddress(muxed: any): string {
   throw new Error('Unknown muxed account type');
 }
 
-export class Transaction<TMemo extends Memo = Memo, TOps extends any[] = any[]> {
+export class Transaction<TMemo extends Memo = Memo, TOps extends any[] = Operation[]> {
   readonly source: string;
   readonly fee: string;
   readonly sequence: string;
   readonly memo: Memo;
-  readonly operations: any[];
+  readonly operations: TOps;
   readonly timeBounds: { minTime: string; maxTime: string } | null;
   readonly networkPassphrase: string;
 
@@ -93,7 +93,7 @@ export class Transaction<TMemo extends Memo = Memo, TOps extends any[] = any[]> 
     this.fee = this._tx.fee.toString();
     this.sequence = this._tx.seqNum.toString();
     this.memo = Memo._fromModern(this._tx.memo);
-    this.operations = this._tx.operations.map(op => Operation.fromXDRObject(op));
+    this.operations = this._tx.operations.map(op => Operation.fromXDRObject(op)) as unknown as TOps;
 
     if (is(this._tx.cond, 'Time')) {
       this.timeBounds = {
@@ -130,21 +130,21 @@ export class Transaction<TMemo extends Memo = Memo, TOps extends any[] = any[]> 
     }
   }
 
-  hash(): Uint8Array {
+  hash(): any {
     return this._hash;
   }
 
-  signatureBase(): Uint8Array {
+  signatureBase(_format?: string): any {
     const nid = networkId(this.networkPassphrase);
     const txBytes = TransactionCodec.toXdr(this._tx);
     const tagged = new Uint8Array(nid.length + ENVELOPE_TYPE_TX.length + txBytes.length);
     tagged.set(nid, 0);
     tagged.set(ENVELOPE_TYPE_TX, nid.length);
     tagged.set(txBytes, nid.length + ENVELOPE_TYPE_TX.length);
-    return tagged;
+    return augmentBuffer(tagged);
   }
 
-  get signatures(): ModernDecoratedSignature[] {
+  get signatures(): any[] {
     return this._signatures;
   }
 
@@ -219,21 +219,21 @@ export class FeeBumpTransaction {
     }
   }
 
-  hash(): Uint8Array {
+  hash(): any {
     return this._hash;
   }
 
-  signatureBase(): Uint8Array {
+  signatureBase(_format?: string): any {
     const nid = networkId(this.networkPassphrase);
     const txBytes = FeeBumpTransactionCodec.toXdr(this._tx);
     const tagged = new Uint8Array(nid.length + ENVELOPE_TYPE_TX_FEE_BUMP.length + txBytes.length);
     tagged.set(nid, 0);
     tagged.set(ENVELOPE_TYPE_TX_FEE_BUMP, nid.length);
     tagged.set(txBytes, nid.length + ENVELOPE_TYPE_TX_FEE_BUMP.length);
-    return tagged;
+    return augmentBuffer(tagged);
   }
 
-  get signatures(): ModernDecoratedSignature[] {
+  get signatures(): any[] {
     return this._signatures;
   }
 

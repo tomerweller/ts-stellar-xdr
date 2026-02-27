@@ -72,6 +72,10 @@ function mockStreamFetch(chunks: string[]) {
   return fn;
 }
 
+const PUBKEY1 = 'GBMZSZP7FWHX6OTYMKCUS55EHT2DECX3IIIMZP4AAMSWYX3VVAED5JVC';
+const PUBKEY2 = 'GABHZBLQHGDTFYSS7O52RQCQBL7GTURQM5WXFU2ZFXSIGBN4BEYOOOMZ';
+const DEST = 'GAT4KBPBCPTOLGILH5NNTBWSXHEBUTRQMEUSQGSPCCFM4QHO2COADB5O';
+
 const server = new Horizon.Server('https://horizon.stellar.org');
 
 // ---------------------------------------------------------------------------
@@ -133,14 +137,14 @@ describe('fetchBaseFee()', () => {
 describe('loadAccount()', () => {
   it('returns AccountResponse usable with TransactionBuilder', async () => {
     mockFetch(halRecord({
-      id: 'GABC',
-      account_id: 'GABC',
+      id: PUBKEY1,
+      account_id: PUBKEY1,
       sequence: '42',
       balances: [],
       signers: [],
     }));
-    const account = await server.loadAccount('GABC');
-    expect(account.accountId()).toBe('GABC');
+    const account = await server.loadAccount(PUBKEY1);
+    expect(account.accountId()).toBe(PUBKEY1);
     expect(account.sequenceNumber()).toBe('42');
     expect(account).toBeInstanceOf(Horizon.AccountResponse);
     // Can increment sequence
@@ -237,10 +241,10 @@ describe('AccountCallBuilder', () => {
   });
 
   it('accountId() fetches single account', async () => {
-    const fn = mockFetch(halRecord({ id: 'GABC', account_id: 'GABC' }));
-    const result = await server.accounts().accountId('GABC').call();
-    expect(result.account_id).toBe('GABC');
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC');
+    const fn = mockFetch(halRecord({ id: PUBKEY1, account_id: PUBKEY1 }));
+    const result = await server.accounts().accountId(PUBKEY1).call();
+    expect(result.account_id).toBe(PUBKEY1);
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}`);
   });
 
   it('forSigner() passes signer param', async () => {
@@ -251,8 +255,8 @@ describe('AccountCallBuilder', () => {
 
   it('forAsset() passes asset string', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.accounts().forAsset(new Asset('USD', 'GISSUER')).call();
-    expect(fetchUrl(fn).searchParams.get('asset')).toBe('USD:GISSUER');
+    await server.accounts().forAsset(new Asset('USD', PUBKEY2)).call();
+    expect(fetchUrl(fn).searchParams.get('asset')).toBe(`USD:${PUBKEY2}`);
   });
 
   it('sponsor() passes sponsor param', async () => {
@@ -282,8 +286,8 @@ describe('TransactionCallBuilder', () => {
 
   it('forAccount() changes path', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.transactions().forAccount('GABC').call();
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC/transactions');
+    await server.transactions().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}/transactions`);
   });
 
   it('forLedger() changes path', async () => {
@@ -325,8 +329,8 @@ describe('OperationCallBuilder', () => {
 
   it('forAccount() changes path', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.operations().forAccount('GABC').call();
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC/operations');
+    await server.operations().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}/operations`);
   });
 
   it('forTransaction() changes path', async () => {
@@ -361,8 +365,8 @@ describe('PaymentCallBuilder', () => {
 
   it('forAccount() changes path', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.payments().forAccount('GABC').call();
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC/payments');
+    await server.payments().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}/payments`);
   });
 
   it('forLedger() changes path', async () => {
@@ -391,8 +395,8 @@ describe('EffectCallBuilder', () => {
 
   it('forAccount() changes path', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.effects().forAccount('GABC').call();
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC/effects');
+    await server.effects().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}/effects`);
   });
 
   it('forLedger() changes path', async () => {
@@ -434,15 +438,15 @@ describe('OfferCallBuilder', () => {
 
   it('forAccount() changes path', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.offers().forAccount('GABC').call();
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC/offers');
+    await server.offers().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}/offers`);
   });
 
   it('selling() and buying() pass asset params', async () => {
     const fn = mockFetch(halCollection([]));
     await server.offers()
       .selling(Asset.native())
-      .buying(new Asset('USD', 'GISSUER'))
+      .buying(new Asset('USD', PUBKEY2))
       .call();
     const url = fetchUrl(fn);
     expect(url.searchParams.get('selling_asset_type')).toBe('native');
@@ -471,7 +475,7 @@ describe('TradesCallBuilder', () => {
   it('forAssetPair() passes asset params', async () => {
     const fn = mockFetch(halCollection([]));
     await server.trades()
-      .forAssetPair(Asset.native(), new Asset('USD', 'GI'))
+      .forAssetPair(Asset.native(), new Asset('USD', DEST))
       .call();
     const url = fetchUrl(fn);
     expect(url.searchParams.get('base_asset_type')).toBe('native');
@@ -492,8 +496,8 @@ describe('TradesCallBuilder', () => {
 
   it('forAccount() changes path', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.trades().forAccount('GABC').call();
-    expect(fetchUrl(fn).pathname).toBe('/accounts/GABC/trades');
+    await server.trades().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).pathname).toBe(`/accounts/${PUBKEY1}/trades`);
   });
 });
 
@@ -510,10 +514,10 @@ describe('AssetsCallBuilder', () => {
 
   it('forCode() and forIssuer() pass params', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.assets().forCode('USD').forIssuer('GISSUER').call();
+    await server.assets().forCode('USD').forIssuer(PUBKEY2).call();
     const url = fetchUrl(fn);
     expect(url.searchParams.get('asset_code')).toBe('USD');
-    expect(url.searchParams.get('asset_issuer')).toBe('GISSUER');
+    expect(url.searchParams.get('asset_issuer')).toBe(PUBKEY2);
   });
 });
 
@@ -575,15 +579,15 @@ describe('LiquidityPoolCallBuilder', () => {
   it('forAssets() passes reserves param', async () => {
     const fn = mockFetch(halCollection([]));
     await server.liquidityPools()
-      .forAssets(Asset.native(), new Asset('USD', 'GISSUER'))
+      .forAssets(Asset.native(), new Asset('USD', PUBKEY2))
       .call();
-    expect(fetchUrl(fn).searchParams.get('reserves')).toBe('native,USD:GISSUER');
+    expect(fetchUrl(fn).searchParams.get('reserves')).toBe(`native,USD:${PUBKEY2}`);
   });
 
   it('forAccount() passes account param', async () => {
     const fn = mockFetch(halCollection([]));
-    await server.liquidityPools().forAccount('GABC').call();
-    expect(fetchUrl(fn).searchParams.get('account')).toBe('GABC');
+    await server.liquidityPools().forAccount(PUBKEY1).call();
+    expect(fetchUrl(fn).searchParams.get('account')).toBe(PUBKEY1);
   });
 });
 
@@ -594,7 +598,7 @@ describe('LiquidityPoolCallBuilder', () => {
 describe('OrderbookCallBuilder', () => {
   it('passes selling and buying asset params', async () => {
     const fn = mockFetch({ bids: [], asks: [], base: {}, counter: {} });
-    await server.orderbook(Asset.native(), new Asset('USD', 'GISSUER')).call();
+    await server.orderbook(Asset.native(), new Asset('USD', PUBKEY2)).call();
     const url = fetchUrl(fn);
     expect(url.pathname).toBe('/order_book');
     expect(url.searchParams.get('selling_asset_type')).toBe('native');
@@ -604,7 +608,7 @@ describe('OrderbookCallBuilder', () => {
 
   it('limit() passes limit param', async () => {
     const fn = mockFetch({ bids: [], asks: [], base: {}, counter: {} });
-    await server.orderbook(Asset.native(), new Asset('USD', 'GI')).limit(20).call();
+    await server.orderbook(Asset.native(), new Asset('USD', DEST)).limit(20).call();
     expect(fetchUrl(fn).searchParams.get('limit')).toBe('20');
   });
 });
@@ -627,12 +631,12 @@ describe('strictReceivePaths()', () => {
   it('passes source_assets when array', async () => {
     const fn = mockFetch(halCollection([]));
     await server.strictReceivePaths(
-      [Asset.native(), new Asset('EUR', 'GI')],
-      new Asset('USD', 'GI'),
+      [Asset.native(), new Asset('EUR', DEST)],
+      new Asset('USD', DEST),
       '50',
     ).call();
     const url = fetchUrl(fn);
-    expect(url.searchParams.get('source_assets')).toBe('native,EUR:GI');
+    expect(url.searchParams.get('source_assets')).toBe(`native,EUR:${DEST}`);
   });
 });
 
@@ -656,9 +660,9 @@ describe('strictSendPaths()', () => {
     await server.strictSendPaths(
       Asset.native(),
       '100',
-      [new Asset('EUR', 'GI')],
+      [new Asset('EUR', DEST)],
     ).call();
-    expect(fetchUrl(fn).searchParams.get('destination_assets')).toBe('EUR:GI');
+    expect(fetchUrl(fn).searchParams.get('destination_assets')).toBe(`EUR:${DEST}`);
   });
 });
 
@@ -671,7 +675,7 @@ describe('tradeAggregation()', () => {
     const fn = mockFetch(halCollection([]));
     await server.tradeAggregation(
       Asset.native(),
-      new Asset('USD', 'GI'),
+      new Asset('USD', DEST),
       1000000,
       2000000,
       3600000,
@@ -729,7 +733,7 @@ describe('CallBuilder.stream()', () => {
 
   it('stream on forAccount scoped builder uses correct path', async () => {
     const fn = mockStreamFetch(['data: {}\n\n']);
-    const close = server.transactions().forAccount('GABC').cursor('now').stream({
+    const close = server.transactions().forAccount(PUBKEY1).cursor('now').stream({
       onmessage: () => {},
       onerror: () => {},
     });
@@ -738,7 +742,7 @@ describe('CallBuilder.stream()', () => {
     close();
 
     const url = new URL(fn.mock.calls[0]![0] as string);
-    expect(url.pathname).toBe('/accounts/GABC/transactions');
+    expect(url.pathname).toBe(`/accounts/${PUBKEY1}/transactions`);
   });
 });
 
@@ -750,7 +754,7 @@ describe('fluent chaining', () => {
   it('methods return this for chaining', async () => {
     const fn = mockFetch(halCollection([]));
     const builder = server.transactions()
-      .forAccount('GABC')
+      .forAccount(PUBKEY1)
       .includeFailed(true)
       .cursor('abc')
       .limit(10)
@@ -759,7 +763,7 @@ describe('fluent chaining', () => {
     await builder.call();
 
     const url = fetchUrl(fn);
-    expect(url.pathname).toBe('/accounts/GABC/transactions');
+    expect(url.pathname).toBe(`/accounts/${PUBKEY1}/transactions`);
     expect(url.searchParams.get('include_failed')).toBe('true');
     expect(url.searchParams.get('cursor')).toBe('abc');
     expect(url.searchParams.get('limit')).toBe('10');

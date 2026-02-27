@@ -8,8 +8,6 @@ import {
   STRKEY_ED25519_PUBLIC,
   STRKEY_MUXED_ED25519,
   STRKEY_CONTRACT,
-  type SCVal,
-  type SCAddress,
 } from '@stellar/xdr';
 
 export class Address {
@@ -28,7 +26,7 @@ export class Address {
     return new Address(address);
   }
 
-  static fromScAddress(scAddress: SCAddress): Address {
+  static fromScAddress(scAddress: any): Address {
     if ('Account' in scAddress) {
       const pk = scAddress.Account;
       if ('PublicKeyTypeEd25519' in pk) {
@@ -38,6 +36,19 @@ export class Address {
     if ('Contract' in scAddress) {
       return new Address(encodeStrkey(STRKEY_CONTRACT, scAddress.Contract));
     }
+    // Handle compat ScAddress with accessor methods
+    if (typeof scAddress.switch === 'function') {
+      const switchVal = scAddress.switch();
+      const name = typeof switchVal === 'string' ? switchVal : switchVal?.name;
+      if (name === 'scAddressTypeAccount' && typeof scAddress.accountId === 'function') {
+        const accountId = scAddress.accountId();
+        const ed25519 = typeof accountId.ed25519 === 'function' ? accountId.ed25519() : accountId.PublicKeyTypeEd25519;
+        return new Address(encodeStrkey(STRKEY_ED25519_PUBLIC, ed25519));
+      }
+      if (name === 'scAddressTypeContract' && typeof scAddress.contractId === 'function') {
+        return new Address(encodeStrkey(STRKEY_CONTRACT, scAddress.contractId()));
+      }
+    }
     throw new Error('Unsupported SCAddress type');
   }
 
@@ -45,7 +56,7 @@ export class Address {
     return this._address;
   }
 
-  toScAddress(): SCAddress {
+  toScAddress(): any {
     if (this._version === STRKEY_ED25519_PUBLIC) {
       return { Account: { PublicKeyTypeEd25519: this._payload } };
     }
@@ -55,7 +66,7 @@ export class Address {
     throw new Error(`Cannot convert address type ${this._version} to SCAddress`);
   }
 
-  toScVal(): SCVal {
+  toScVal(): any {
     return { Address: this.toScAddress() };
   }
 

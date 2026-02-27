@@ -13,11 +13,11 @@ import {
   encodeStrkey,
   STRKEY_ED25519_PUBLIC,
 } from '@stellar/xdr';
+import { Account } from '@stellar/stellar-base-comp';
 import type {
   GetHealthResponse,
   GetNetworkResponse,
   GetLatestLedgerResponse,
-  GetAccountResponse,
   SimulateTransactionResponse,
   SendTransactionResponse,
   GetTransactionResponse,
@@ -52,12 +52,14 @@ export class Server {
     return this._client.getLatestLedger() as any;
   }
 
-  async getAccount(address: string): Promise<GetAccountResponse> {
+  async getAccount(address: string): Promise<Account> {
     const account = await this._client.getAccount(address);
-    return {
-      id: address,
-      sequence: account.seqNum.toString(),
-    };
+    const seq = account.seqNum.toString();
+    const result = new Account(address, seq);
+    // Add id and sequence properties for compat (official SDK includes these)
+    (result as any).id = address;
+    (result as any).sequence = seq;
+    return result;
   }
 
   async simulateTransaction(tx: any): Promise<SimulateTransactionResponse> {

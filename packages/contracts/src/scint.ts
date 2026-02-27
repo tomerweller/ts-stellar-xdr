@@ -3,7 +3,6 @@
  */
 
 import type {
-  SCVal,
   Int128Parts,
   UInt128Parts,
   Int256Parts,
@@ -89,37 +88,37 @@ export class ScInt {
     return Number(this._value);
   }
 
-  toI64(): SCVal {
+  toI64(): any {
     assertRange('i64', this._value);
     return { I64: this._value };
   }
 
-  toU64(): SCVal {
+  toU64(): any {
     assertRange('u64', this._value);
     return { U64: this._value };
   }
 
-  toI128(): SCVal {
+  toI128(): any {
     assertRange('i128', this._value);
     return { I128: splitI128(this._value) };
   }
 
-  toU128(): SCVal {
+  toU128(): any {
     assertRange('u128', this._value);
     return { U128: splitU128(this._value) };
   }
 
-  toI256(): SCVal {
+  toI256(): any {
     assertRange('i256', this._value);
     return { I256: splitI256(this._value) };
   }
 
-  toU256(): SCVal {
+  toU256(): any {
     assertRange('u256', this._value);
     return { U256: splitU256(this._value) };
   }
 
-  toScVal(): SCVal {
+  toScVal(): any {
     if (this._type) {
       assertRange(this._type, this._value);
       switch (this._type) {

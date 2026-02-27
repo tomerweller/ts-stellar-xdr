@@ -3,14 +3,13 @@
  * Compatible with js-stellar-base.
  */
 
-import type { SCVal, SCAddress } from '@stellar/xdr';
 import { Address } from './address.js';
 
 export interface NativeToScValOpts {
   type?: string;
 }
 
-export function nativeToScVal(val: any, opts?: NativeToScValOpts): SCVal {
+export function nativeToScVal(val: any, opts?: NativeToScValOpts): any {
   const type = opts?.type;
 
   if (val === null || val === undefined) {
@@ -35,7 +34,7 @@ export function nativeToScVal(val: any, opts?: NativeToScValOpts): SCVal {
       case 'address':
         if (val instanceof Address) return val.toScVal();
         if (typeof val === 'string') return new Address(val).toScVal();
-        return { Address: val as SCAddress };
+        return { Address: val };
     }
   }
 
@@ -71,11 +70,16 @@ export function nativeToScVal(val: any, opts?: NativeToScValOpts): SCVal {
   throw new Error(`Cannot convert ${typeof val} to SCVal`);
 }
 
-export function scValToNative(scval: SCVal): any {
+export function scValToNative(scval: any): any {
   if (typeof scval === 'string') {
     // void arms
     if (scval === 'Void' || scval === 'LedgerKeyContractInstance') return null;
     return scval;
+  }
+
+  // Handle compat ScVal objects with .switch()/.value() methods
+  if (typeof scval?.switch === 'function') {
+    return scValToNative(scval._toModern ? scval._toModern() : scval);
   }
 
   if ('Bool' in scval) return scval.Bool;

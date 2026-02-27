@@ -6,8 +6,6 @@ import {
   decodeStrkey,
   encodeStrkey,
   STRKEY_CONTRACT,
-  type SCVal,
-  type SCAddress,
 } from '@stellar/xdr';
 
 export class Contract {
@@ -30,10 +28,10 @@ export class Contract {
     return new Address(this.contractId());
   }
 
-  call(method: string, ...args: SCVal[]): SCVal {
+  call(method: string, ...args: any[]): any {
     return {
       Vec: [
-        { Address: { Contract: this._id } as SCAddress },
+        { Address: { Contract: this._id } },
         { Symbol: method },
         ...args,
       ],
@@ -43,8 +41,8 @@ export class Contract {
   getFootprint(): any {
     return {
       ContractData: {
-        contract: { Contract: this._id } as SCAddress,
-        key: 'LedgerKeyContractInstance' as SCVal,
+        contract: { Contract: this._id },
+        key: 'LedgerKeyContractInstance',
         durability: 'Persistent',
       },
     };

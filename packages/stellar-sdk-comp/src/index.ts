@@ -20,8 +20,19 @@ export { AccountRequiresMemoError } from '@stellar/seps';
 // Contract namespace
 export * as contract from './contract/index.js';
 
-// Top-level re-exports from @stellar/contracts
-export { walkInvocationTree, buildInvocationTree } from '@stellar/contracts';
+// Top-level re-exports from @stellar/contracts (wrapped for compat types)
+import {
+  walkInvocationTree as _walkInvocationTree,
+  buildInvocationTree as _buildInvocationTree,
+} from '@stellar/contracts';
+export function walkInvocationTree(root: any, callback: (node: any, depth: number) => any): void {
+  const modernRoot = root?._toModern ? root._toModern() : root;
+  return _walkInvocationTree(modernRoot, callback as any);
+}
+export function buildInvocationTree(root: any): any {
+  const modernRoot = root?._toModern ? root._toModern() : root;
+  return _buildInvocationTree(modernRoot);
+}
 
 // Helpers
 export { basicNodeSigner } from './basic-node-signer.js';

@@ -2,13 +2,17 @@
  * scValToBigInt — extract a bigint from integer-typed SCVal values.
  */
 
-import { is, type SCVal } from '@stellar/xdr';
+import { is } from '@stellar/xdr';
 
 /**
  * Convert an integer-typed SCVal to bigint.
  * Supports: U64, I64, U128, I128, U256, I256, Timepoint, Duration.
  */
-export function scValToBigInt(scv: SCVal): bigint {
+export function scValToBigInt(scv: any): bigint {
+  // Handle compat ScVal objects with _toModern()
+  if (typeof scv?.switch === 'function' && typeof scv?._toModern === 'function') {
+    scv = scv._toModern();
+  }
   if (is(scv, 'U64')) return scv.U64;
   if (is(scv, 'I64')) return scv.I64;
   if (is(scv, 'Timepoint')) return scv.Timepoint;

@@ -249,7 +249,7 @@ export interface OperationRecord {
   created_at: string;
   transaction_hash: string;
   transaction_successful: boolean;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 // ---------------------------------------------------------------------------
@@ -263,7 +263,7 @@ export interface EffectRecord {
   type: string;
   type_i: number;
   created_at: string;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 // ---------------------------------------------------------------------------
@@ -272,8 +272,8 @@ export interface EffectRecord {
 
 export interface OfferAssetInfo {
   asset_type: AssetType;
-  asset_code?: string;
-  asset_issuer?: string;
+  asset_code: string;
+  asset_issuer: string;
 }
 
 export interface OfferRecord {

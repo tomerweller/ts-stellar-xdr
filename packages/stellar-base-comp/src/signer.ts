@@ -8,11 +8,11 @@ export namespace Signer {
     weight: number | undefined;
   }
   export interface Sha256Hash {
-    sha256Hash: Uint8Array;
+    sha256Hash: any;
     weight: number | undefined;
   }
   export interface PreAuthTx {
-    preAuthTx: Uint8Array;
+    preAuthTx: any;
     weight: number | undefined;
   }
   export interface Ed25519SignedPayload {
@@ -32,10 +32,10 @@ export namespace SignerKeyOptions {
     ed25519PublicKey: string;
   }
   export interface Sha256Hash {
-    sha256Hash: Uint8Array | string;
+    sha256Hash: any;
   }
   export interface PreAuthTx {
-    preAuthTx: Uint8Array | string;
+    preAuthTx: any;
   }
   export interface Ed25519SignedPayload {
     ed25519SignedPayload: string;

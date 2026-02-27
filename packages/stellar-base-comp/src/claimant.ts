@@ -4,15 +4,14 @@
 
 import type {
   Claimant as ModernClaimant,
-  ClaimPredicate as ModernClaimPredicate,
 } from '@stellar/xdr';
 import { parsePublicKey } from '@stellar/tx-builder';
 
 export class Claimant {
   readonly destination: string;
-  readonly predicate: ModernClaimPredicate;
+  readonly predicate: any;
 
-  constructor(destination: string, predicate?: ModernClaimPredicate) {
+  constructor(destination: string, predicate?: any) {
     this.destination = destination;
     this.predicate = predicate ?? Claimant.predicateUnconditional();
   }
@@ -26,27 +25,27 @@ export class Claimant {
     };
   }
 
-  static predicateUnconditional(): ModernClaimPredicate {
+  static predicateUnconditional(): any {
     return 'Unconditional';
   }
 
-  static predicateAnd(...predicates: ModernClaimPredicate[]): ModernClaimPredicate {
+  static predicateAnd(...predicates: any[]): any {
     return { And: predicates };
   }
 
-  static predicateOr(...predicates: ModernClaimPredicate[]): ModernClaimPredicate {
+  static predicateOr(...predicates: any[]): any {
     return { Or: predicates };
   }
 
-  static predicateNot(predicate: ModernClaimPredicate): ModernClaimPredicate {
+  static predicateNot(predicate: any): any {
     return { Not: predicate };
   }
 
-  static predicateBeforeAbsoluteTime(epochSeconds: string): ModernClaimPredicate {
+  static predicateBeforeAbsoluteTime(epochSeconds: string): any {
     return { BeforeAbsoluteTime: BigInt(epochSeconds) };
   }
 
-  static predicateBeforeRelativeTime(seconds: string): ModernClaimPredicate {
+  static predicateBeforeRelativeTime(seconds: string): any {
     return { BeforeRelativeTime: BigInt(seconds) };
   }
 }

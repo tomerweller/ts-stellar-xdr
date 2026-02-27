@@ -19,8 +19,8 @@ import {
   STRKEY_ED25519_PUBLIC,
   STRKEY_ED25519_PRIVATE,
 } from '@stellar/strkey';
-import type { DecoratedSignature } from '@stellar/xdr';
 import { PublicKey, MuxedAccount } from './generated/stellar_compat.js';
+import { augmentBuffer } from './signing.js';
 
 // Configure sync SHA-512 for @noble/ed25519
 etc.sha512Sync = (...msgs: Uint8Array[]) => sha512(etc.concatBytes(...msgs));
@@ -100,18 +100,18 @@ export class Keypair {
     return this._secretKey !== null;
   }
 
-  signatureHint(): Uint8Array {
-    return this._publicKey.slice(-4);
+  signatureHint(): any {
+    return augmentBuffer(this._publicKey.slice(-4));
   }
 
-  sign(data: Uint8Array): Uint8Array {
+  sign(data: Uint8Array): any {
     if (this._secretKey === null) {
       throw new Error('Cannot sign: no secret key available');
     }
-    return sign(data, this._secretKey);
+    return augmentBuffer(sign(data, this._secretKey));
   }
 
-  signDecorated(data: Uint8Array): DecoratedSignature {
+  signDecorated(data: Uint8Array): any {
     const signature = this.sign(data);
     return { hint: this.signatureHint(), signature };
   }

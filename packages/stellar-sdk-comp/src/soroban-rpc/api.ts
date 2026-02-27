@@ -29,10 +29,10 @@ export interface GetAccountResponse {
 export interface SimulateTransactionResponse {
   latestLedger: number;
   cost?: { cpuInsns: string; memBytes: string };
-  transactionData?: string;
+  transactionData?: any;
   minResourceFee?: string;
   events?: string[];
-  results?: Array<{ xdr: string }>;
+  results?: Array<{ xdr: string; auth?: any[] }>;
   result?: { retval: any; auth?: any[] };
   error?: string;
   [key: string]: any;
@@ -104,8 +104,15 @@ export interface RawGetLedgerEntriesResponse {
   latestLedger: number;
 }
 
-// Re-export type guards from rpc-client
-export { isSimulationError, isSimulationSuccess, isSimulationRestore } from '@stellar/rpc-client';
+// Type guard wrappers — accept any SimulateTransactionResponse shape
+import {
+  isSimulationError as _isSimulationError,
+  isSimulationSuccess as _isSimulationSuccess,
+  isSimulationRestore as _isSimulationRestore,
+} from '@stellar/rpc-client';
+export function isSimulationError(sim: any): sim is SimulateTransactionErrorResponse { return _isSimulationError(sim); }
+export function isSimulationSuccess(sim: any): sim is SimulateTransactionSuccessResponse { return _isSimulationSuccess(sim); }
+export function isSimulationRestore(sim: any): boolean { return _isSimulationRestore(sim); }
 
 // Status enum objects (Freighter uses SorobanRpc.Api.SendTransactionStatus.PENDING etc.)
 export const SendTransactionStatus = {
@@ -126,10 +133,28 @@ export const GetTransactionStatus = {
 
 export type GetTransactionStatus = 'SUCCESS' | 'NOT_FOUND' | 'FAILED';
 
-// Re-export types from rpc-client that may be needed
+// Compat versions of response types — use `any` for XDR-typed fields
+// to avoid readonly/WritableDraft incompatibilities
+export interface SimulateTransactionSuccessResponse {
+  latestLedger: number;
+  cost: { cpuInsns: string; memBytes: string };
+  transactionData: any;
+  minResourceFee: string;
+  events: string[];
+  results: Array<{ xdr: string; auth?: any[] }>;
+  result?: { retval: any; auth?: any[] };
+  [key: string]: any;
+}
+
+export interface SimulateTransactionErrorResponse {
+  latestLedger: number;
+  error: string;
+  events?: string[];
+  [key: string]: any;
+}
+
+// Re-export additional rpc-client types
 export type {
-  SimulateTransactionSuccessResponse,
-  SimulateTransactionErrorResponse,
   SendTransactionResponse as RawSendTransactionResponse,
   SendTransactionStatus as SendTransactionStatusType,
   GetTransactionStatus as GetTransactionStatusType,

@@ -5,11 +5,29 @@
 export interface AssetLike {
   readonly code: string;
   readonly issuer?: string;
+  [key: string]: any;
+}
+
+function wrapAsset(asset: AssetLike): AssetLike {
+  // If it already has getCode/getIssuer methods, return as-is
+  if (typeof (asset as any).getCode === 'function') return asset;
+  // Add accessor methods directly to the object (non-enumerable, preserves identity)
+  Object.defineProperty(asset, 'getCode', {
+    value: () => asset.code,
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(asset, 'getIssuer', {
+    value: () => asset.issuer ?? '',
+    enumerable: false,
+    configurable: true,
+  });
+  return asset;
 }
 
 export class LiquidityPoolAsset {
-  readonly assetA: AssetLike;
-  readonly assetB: AssetLike;
+  readonly assetA: any;
+  readonly assetB: any;
   readonly fee: number;
 
   constructor(assetA: AssetLike, assetB: AssetLike, fee: number = 30) {
@@ -20,14 +38,14 @@ export class LiquidityPoolAsset {
         'Assets must be in lexicographic order (assetA < assetB)',
       );
     }
-    this.assetA = assetA;
-    this.assetB = assetB;
+    this.assetA = wrapAsset(assetA);
+    this.assetB = wrapAsset(assetB);
     this.fee = fee;
   }
 
   getLiquidityPoolParameters(): {
-    assetA: AssetLike;
-    assetB: AssetLike;
+    assetA: any;
+    assetB: any;
     fee: number;
   } {
     return {

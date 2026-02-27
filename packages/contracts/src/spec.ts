@@ -13,9 +13,9 @@ import {
  * Represents a parsed Soroban contract specification.
  */
 export class Spec {
-  readonly entries: readonly import('@stellar/xdr').SCSpecEntry[];
+  readonly entries: readonly any[];
 
-  constructor(entries: readonly import('@stellar/xdr').SCSpecEntry[]) {
+  constructor(entries: readonly any[]) {
     this.entries = entries;
   }
 

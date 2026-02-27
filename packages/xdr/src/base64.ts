@@ -1,7 +1,11 @@
+// Access Buffer via globalThis to avoid webpack trying to resolve the 'buffer' module
+const _Buffer: typeof globalThis.Buffer | undefined =
+  typeof globalThis !== 'undefined' ? (globalThis as any).Buffer : undefined;
+
 export function encodeBase64(data: Uint8Array): string {
   // Node.js path
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(data.buffer, data.byteOffset, data.byteLength).toString(
+  if (_Buffer) {
+    return _Buffer.from(data.buffer, data.byteOffset, data.byteLength).toString(
       'base64',
     );
   }
@@ -17,8 +21,8 @@ export function decodeBase64(input: string): Uint8Array {
   // Strip whitespace
   const cleaned = input.replace(/\s/g, '');
   // Node.js path
-  if (typeof Buffer !== 'undefined') {
-    const buf = Buffer.from(cleaned, 'base64');
+  if (_Buffer) {
+    const buf = _Buffer.from(cleaned, 'base64');
     return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
   }
   // Browser path
