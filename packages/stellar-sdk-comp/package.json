@@ -17,7 +17,8 @@
     "@stellar/stellar-base-comp": "*",
     "@stellar/rpc-client": "*",
     "@stellar/horizon-client": "*",
-    "@stellar/seps": "*"
+    "@stellar/seps": "*",
+    "@stellar/contracts": "*"
   },
   "engines": {
     "node": ">=18"

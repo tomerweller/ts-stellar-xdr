@@ -16,5 +16,8 @@ export * as Federation from './federation/index.js';
 // SEP-29
 export { AccountRequiresMemoError } from '@stellar/seps';
 
+// Contract namespace
+export * as contract from './contract/index.js';
+
 // Helpers
 export { basicNodeSigner } from './basic-node-signer.js';

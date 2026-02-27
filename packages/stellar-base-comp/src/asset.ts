@@ -17,6 +17,7 @@ import {
   Asset as CompatAssetXdr,
   ChangeTrustAsset as CompatChangeTrustAsset,
 } from './generated/stellar_compat.js';
+import { getAssetContractId } from '@stellar/contracts';
 
 export class Asset {
   private readonly _code: string;
@@ -105,6 +106,10 @@ export class Asset {
       return new Asset(code, issuer);
     }
     throw new Error('Unknown asset type');
+  }
+
+  contractId(networkPassphrase: string): string {
+    return getAssetContractId(this._toModern(), networkPassphrase);
   }
 
   toString(): string {

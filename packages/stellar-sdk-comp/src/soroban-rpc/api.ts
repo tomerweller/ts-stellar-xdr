@@ -87,3 +87,29 @@ export interface GetLedgerEntriesResponse {
   }>;
   latestLedger: number;
 }
+
+// Re-export type guards from rpc-client
+export { isSimulationError, isSimulationSuccess, isSimulationRestore } from '@stellar/rpc-client';
+
+// Status enum objects (Freighter uses SorobanRpc.Api.SendTransactionStatus.PENDING etc.)
+export const SendTransactionStatus = {
+  PENDING: 'PENDING' as const,
+  DUPLICATE: 'DUPLICATE' as const,
+  TRY_AGAIN_LATER: 'TRY_AGAIN_LATER' as const,
+  ERROR: 'ERROR' as const,
+};
+
+export const GetTransactionStatus = {
+  SUCCESS: 'SUCCESS' as const,
+  NOT_FOUND: 'NOT_FOUND' as const,
+  FAILED: 'FAILED' as const,
+};
+
+// Re-export types from rpc-client that may be needed
+export type {
+  SimulateTransactionSuccessResponse,
+  SimulateTransactionErrorResponse,
+  SendTransactionResponse as RawSendTransactionResponse,
+  SendTransactionStatus as SendTransactionStatusType,
+  GetTransactionStatus as GetTransactionStatusType,
+} from '@stellar/rpc-client';

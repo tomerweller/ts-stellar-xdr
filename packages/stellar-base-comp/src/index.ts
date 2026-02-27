@@ -14,7 +14,7 @@ export { toStroops, fromStroops } from './amount.js';
 export { Keypair } from './keypair.js';
 export { Account, MuxedAccount } from './account.js';
 export { Asset } from './asset.js';
-export { Memo } from './memo.js';
+export { Memo, type MemoType } from './memo.js';
 
 // Transaction layer
 export { Operation } from './operation.js';
@@ -31,3 +31,9 @@ export { nativeToScVal, scValToNative } from './scval.js';
 export { authorizeEntry, authorizeInvocation } from './auth.js';
 export { getLiquidityPoolId } from './liquidity-pool.js';
 export { SorobanDataBuilder } from './soroban-data-builder.js';
+
+// Contract utilities (from @stellar/contracts)
+export { LiquidityPoolAsset } from '@stellar/contracts';
+export { ScInt } from '@stellar/contracts';
+export { scValToBigInt } from '@stellar/contracts';
+export { extractBaseAddress } from '@stellar/contracts';

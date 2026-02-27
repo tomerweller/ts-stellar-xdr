@@ -24,3 +24,7 @@ export {
 } from './api.js';
 export type * from './api.js';
 export { AccountRequiresMemoError } from '@stellar/seps';
+
+// Nested namespace aliases for Freighter compat
+export * as HorizonApi from './api.js';
+export * as ServerApi from './api.js';
