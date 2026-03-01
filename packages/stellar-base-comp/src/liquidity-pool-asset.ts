@@ -39,6 +39,10 @@ export class LiquidityPoolAsset {
     this._fee = fee;
   }
 
+  get assetA(): Asset { return this._assetA; }
+  get assetB(): Asset { return this._assetB; }
+  get fee(): number { return this._fee; }
+
   getLiquidityPoolParameters(): { assetA: Asset; assetB: Asset; fee: number } {
     return {
       assetA: this._assetA,
@@ -95,9 +99,9 @@ export class LiquidityPoolAsset {
 
   equals(other: LiquidityPoolAsset): boolean {
     return (
-      this._assetA.equals(other._assetA) &&
-      this._assetB.equals(other._assetB) &&
-      this._fee === other._fee
+      this._assetA.equals(other.assetA) &&
+      this._assetB.equals(other.assetB) &&
+      this._fee === other.fee
     );
   }
 

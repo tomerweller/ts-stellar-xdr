@@ -35,6 +35,8 @@ export class LiquidityPoolId {
     this._poolId = liquidityPoolId;
   }
 
+  get liquidityPoolId(): string { return this._poolId; }
+
   static fromOperation(tlAssetXdr: any): LiquidityPoolId {
     const armName = tlAssetXdr.arm();
     if (armName !== 'liquidityPoolId') {
