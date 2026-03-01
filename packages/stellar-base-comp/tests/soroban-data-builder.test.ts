@@ -7,12 +7,14 @@ describe('SorobanDataBuilder', () => {
       const builder = new SorobanDataBuilder();
       const data = builder.build();
       expect(data).toBeDefined();
-      expect(data.resources.footprint.readOnly).toEqual([]);
-      expect(data.resources.footprint.readWrite).toEqual([]);
-      expect(data.resources.instructions).toBe(0);
-      expect(data.resources.diskReadBytes).toBe(0);
-      expect(data.resources.writeBytes).toBe(0);
-      expect(data.resourceFee).toBe(0n);
+      // build() now returns a compat struct; use _toModern() to inspect
+      const modern = data._toModern();
+      expect(modern.resources.footprint.readOnly).toEqual([]);
+      expect(modern.resources.footprint.readWrite).toEqual([]);
+      expect(modern.resources.instructions).toBe(0);
+      expect(modern.resources.diskReadBytes).toBe(0);
+      expect(modern.resources.writeBytes).toBe(0);
+      expect(modern.resourceFee).toBe(0n);
     });
   });
 
@@ -21,56 +23,60 @@ describe('SorobanDataBuilder', () => {
       const data = new SorobanDataBuilder()
         .setResources(1000, 2000, 3000)
         .build();
-      expect(data.resources.instructions).toBe(1000);
-      expect(data.resources.diskReadBytes).toBe(2000);
-      expect(data.resources.writeBytes).toBe(3000);
+      const modern = data._toModern();
+      expect(modern.resources.instructions).toBe(1000);
+      expect(modern.resources.diskReadBytes).toBe(2000);
+      expect(modern.resources.writeBytes).toBe(3000);
     });
   });
 
   describe('setResourceFee', () => {
     it('sets fee as bigint', () => {
       const data = new SorobanDataBuilder().setResourceFee(12345n).build();
-      expect(data.resourceFee).toBe(12345n);
+      expect(data._toModern().resourceFee).toBe(12345n);
     });
 
     it('sets fee as string', () => {
       const data = new SorobanDataBuilder().setResourceFee('99999').build();
-      expect(data.resourceFee).toBe(99999n);
+      expect(data._toModern().resourceFee).toBe(99999n);
     });
 
     it('sets fee as number', () => {
       const data = new SorobanDataBuilder().setResourceFee(42).build();
-      expect(data.resourceFee).toBe(42n);
+      expect(data._toModern().resourceFee).toBe(42n);
     });
   });
 
   describe('setFootprint', () => {
     it('sets read-only and read-write', () => {
-      const readOnly = [{ Account: { PublicKeyTypeEd25519: new Uint8Array(32) } }] as any;
-      const readWrite = [{ Account: { PublicKeyTypeEd25519: new Uint8Array(32) } }] as any;
+      const readOnly = [{ Account: { accountID: { PublicKeyTypeEd25519: new Uint8Array(32) } } }] as any;
+      const readWrite = [{ Account: { accountID: { PublicKeyTypeEd25519: new Uint8Array(32) } } }] as any;
       const data = new SorobanDataBuilder()
         .setFootprint(readOnly, readWrite)
         .build();
-      expect(data.resources.footprint.readOnly.length).toBe(1);
-      expect(data.resources.footprint.readWrite.length).toBe(1);
+      const modern = data._toModern();
+      expect(modern.resources.footprint.readOnly.length).toBe(1);
+      expect(modern.resources.footprint.readWrite.length).toBe(1);
     });
   });
 
   describe('setReadOnly', () => {
     it('sets read-only without changing read-write', () => {
-      const readOnly = [{ Account: { PublicKeyTypeEd25519: new Uint8Array(32) } }] as any;
+      const readOnly = [{ Account: { accountID: { PublicKeyTypeEd25519: new Uint8Array(32) } } }] as any;
       const data = new SorobanDataBuilder().setReadOnly(readOnly).build();
-      expect(data.resources.footprint.readOnly.length).toBe(1);
-      expect(data.resources.footprint.readWrite.length).toBe(0);
+      const modern = data._toModern();
+      expect(modern.resources.footprint.readOnly.length).toBe(1);
+      expect(modern.resources.footprint.readWrite.length).toBe(0);
     });
   });
 
   describe('setReadWrite', () => {
     it('sets read-write without changing read-only', () => {
-      const readWrite = [{ Account: { PublicKeyTypeEd25519: new Uint8Array(32) } }] as any;
+      const readWrite = [{ Account: { accountID: { PublicKeyTypeEd25519: new Uint8Array(32) } } }] as any;
       const data = new SorobanDataBuilder().setReadWrite(readWrite).build();
-      expect(data.resources.footprint.readOnly.length).toBe(0);
-      expect(data.resources.footprint.readWrite.length).toBe(1);
+      const modern = data._toModern();
+      expect(modern.resources.footprint.readOnly.length).toBe(0);
+      expect(modern.resources.footprint.readWrite.length).toBe(1);
     });
   });
 
@@ -80,8 +86,9 @@ describe('SorobanDataBuilder', () => {
         .setResources(100, 200, 300)
         .setResourceFee(500n)
         .build();
-      expect(data.resources.instructions).toBe(100);
-      expect(data.resourceFee).toBe(500n);
+      const modern = data._toModern();
+      expect(modern.resources.instructions).toBe(100);
+      expect(modern.resourceFee).toBe(500n);
     });
   });
 });

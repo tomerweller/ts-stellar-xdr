@@ -13,14 +13,41 @@ import {
   optionConverter,
   arrayConverter,
   lazyConverter,
+  opaqueStringConv,
   type Converter,
   Hyper,
   UnsignedHyper,
 } from '../xdr-compat/index.js';
+import { augmentBuffer } from '../signing.js';
 
 const id = identity<any>();
+const opaqueStr = opaqueStringConv();
 const int64Conv = hyperConverter();
 const uint64Conv = unsignedHyperConverter();
+
+// Memo text converter: toModern always produces a string, toCompat keeps original type
+const memoTextConv: Converter<any, any> = {
+  toCompat: (v: any) => v,
+  toModern: (v: any) => {
+    if (typeof v === 'string') return v;
+    // For byte values, use Latin-1 decoding (each byte → one char) to preserve raw bytes
+    if (v instanceof Uint8Array) return String.fromCharCode(...v);
+    if (Array.isArray(v)) return String.fromCharCode(...v);
+    return v;
+  },
+};
+
+// Buffer augment converter: ensures Uint8Array values have .toString(encoding) and .equals()
+const bufferConv: Converter<any, any> = {
+  toCompat: (v: any) => {
+    if (v instanceof Uint8Array) return augmentBuffer(new Uint8Array(v));
+    return v;
+  },
+  toModern: (v: any) => {
+    if (v instanceof Uint8Array) return v;
+    return v;
+  },
+};
 
 function structConverter(C: any): Converter<any, any> {
   return { toCompat: (m: any) => C._fromModern(m), toModern: (c: any) => c._toModern() };
@@ -791,7 +818,7 @@ const _ScEnvMetaEntry = createCompatUnion({
   codec: modern.SCEnvMetaEntry,
   switchEnum: _ScEnvMetaKind,
   arms: [
-    { switchValues: ['scEnvMetaKindInterfaceVersion'], modern: 'ScEnvMetaKindInterfaceVersion', arm: 'interfaceVersion', convert: id },
+    { switchValues: ['scEnvMetaKindInterfaceVersion'], modern: 'ScEnvMetaKindInterfaceVersion', arm: 'interfaceVersion', convert: structConverter(_ScEnvMetaEntryInterfaceVersion) },
   ],
 });
 export const ScEnvMetaEntry = _ScEnvMetaEntry as unknown as {
@@ -1994,7 +2021,7 @@ export const ContractExecutableType = _ContractExecutableType as unknown as {
 };
 
 export type Hash = Buffer;
-export const Hash = createCompatTypedef({ codec: modern.Hash, convert: id });
+export const Hash = createCompatTypedef({ codec: modern.Hash, convert: bufferConv });
 
 export interface ContractExecutable {
   switch(): ContractExecutableType;
@@ -2163,6 +2190,7 @@ export const ClaimableBalanceId = _ClaimableBalanceId as unknown as {
 };
 
 export type PoolId = Hash;
+export const PoolId = Hash;
 
 export interface ScAddress {
   switch(): ScAddressType;
@@ -2184,7 +2212,7 @@ const _ScAddress = createCompatUnion({
     { switchValues: ['scAddressTypeContract'], modern: 'Contract', arm: 'contractId', convert: id },
     { switchValues: ['scAddressTypeMuxedAccount'], modern: 'MuxedAccount', arm: 'muxedAccount', convert: structConverter(_MuxedEd25519Account) },
     { switchValues: ['scAddressTypeClaimableBalance'], modern: 'ClaimableBalance', arm: 'claimableBalanceId', convert: unionConverter(_ClaimableBalanceId) },
-    { switchValues: ['scAddressTypeLiquidityPool'], modern: 'LiquidityPool', arm: 'liquidityPoolId', convert: id },
+    { switchValues: ['scAddressTypeLiquidityPool'], modern: 'LiquidityPool', arm: 'liquidityPoolId', convert: bufferConv },
   ],
 });
 export const ScAddress = _ScAddress as unknown as {
@@ -2480,7 +2508,7 @@ const _StellarValue = createCompatStruct({
     { name: 'txSetHash', modernName: 'txSetHash', convert: id },
     { name: 'closeTime', modernName: 'closeTime', convert: uint64Conv },
     { name: 'upgrades', modernName: 'upgrades', convert: arrayConverter(id) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_StellarValueExt) },
   ],
 });
 export const StellarValue = _StellarValue as unknown as {
@@ -2532,7 +2560,7 @@ const _LedgerHeaderExtensionV1 = createCompatStruct({
   codec: modern.LedgerHeaderExtensionV1,
   fields: [
     { name: 'flags', modernName: 'flags', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_LedgerHeaderExtensionV1Ext) },
   ],
 });
 export const LedgerHeaderExtensionV1 = _LedgerHeaderExtensionV1 as unknown as {
@@ -2613,7 +2641,7 @@ const _LedgerHeader = createCompatStruct({
     { name: 'baseReserve', modernName: 'baseReserve', convert: id },
     { name: 'maxTxSetSize', modernName: 'maxTxSetSize', convert: id },
     { name: 'skipList', modernName: 'skipList', convert: arrayConverter(id) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_LedgerHeaderExt) },
   ],
 });
 export const LedgerHeader = _LedgerHeader as unknown as {
@@ -2667,7 +2695,7 @@ const _LedgerHeaderHistoryEntry = createCompatStruct({
   fields: [
     { name: 'hash', modernName: 'hash', convert: id },
     { name: 'header', modernName: 'header', convert: structConverter(_LedgerHeader) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_LedgerHeaderHistoryEntryExt) },
   ],
 });
 export const LedgerHeaderHistoryEntry = _LedgerHeaderHistoryEntry as unknown as {
@@ -2780,10 +2808,10 @@ const _Memo = createCompatUnion({
   switchEnum: _MemoType,
   arms: [
     { switchValues: ['memoNone'], modern: 'None' },
-    { switchValues: ['memoText'], modern: 'Text', arm: 'text', convert: id },
+    { switchValues: ['memoText'], modern: 'Text', arm: 'text', convert: memoTextConv },
     { switchValues: ['memoId'], modern: 'Id', arm: 'id', convert: uint64Conv },
-    { switchValues: ['memoHash'], modern: 'Hash', arm: 'hash', convert: id },
-    { switchValues: ['memoReturn'], modern: 'Return', arm: 'retHash', convert: id },
+    { switchValues: ['memoHash'], modern: 'Hash', arm: 'hash', convert: bufferConv },
+    { switchValues: ['memoReturn'], modern: 'Return', arm: 'retHash', convert: bufferConv },
   ],
 });
 export const Memo = _Memo as unknown as {
@@ -2864,7 +2892,7 @@ const _MuxedAccount = createCompatUnion({
   switchEnum: _CryptoKeyType,
   arms: [
     { switchValues: ['keyTypeEd25519'], modern: 'Ed25519', arm: 'ed25519', convert: id },
-    { switchValues: ['keyTypeMuxedEd25519'], modern: 'MuxedEd25519', arm: 'med25519', convert: id },
+    { switchValues: ['keyTypeMuxedEd25519'], modern: 'MuxedEd25519', arm: 'med25519', convert: structConverter(_MuxedAccountMed25519) },
   ],
 });
 export const MuxedAccount = _MuxedAccount as unknown as {
@@ -3005,7 +3033,7 @@ export interface AlphaNum4 {
 const _AlphaNum4 = createCompatStruct({
   codec: modern.AlphaNum4,
   fields: [
-    { name: 'assetCode', modernName: 'assetCode', convert: id },
+    { name: 'assetCode', modernName: 'assetCode', convert: opaqueStr },
     { name: 'issuer', modernName: 'issuer', convert: unionConverter(_PublicKey) },
   ],
 });
@@ -3034,7 +3062,7 @@ export interface AlphaNum12 {
 const _AlphaNum12 = createCompatStruct({
   codec: modern.AlphaNum12,
   fields: [
-    { name: 'assetCode', modernName: 'assetCode', convert: id },
+    { name: 'assetCode', modernName: 'assetCode', convert: opaqueStr },
     { name: 'issuer', modernName: 'issuer', convert: unionConverter(_PublicKey) },
   ],
 });
@@ -3299,7 +3327,7 @@ const _SignerKey = createCompatUnion({
     { switchValues: ['signerKeyTypeEd25519'], modern: 'Ed25519', arm: 'ed25519', convert: id },
     { switchValues: ['signerKeyTypePreAuthTx'], modern: 'PreAuthTx', arm: 'preAuthTx', convert: id },
     { switchValues: ['signerKeyTypeHashX'], modern: 'HashX', arm: 'hashX', convert: id },
-    { switchValues: ['signerKeyTypeEd25519SignedPayload'], modern: 'Ed25519SignedPayload', arm: 'ed25519SignedPayload', convert: id },
+    { switchValues: ['signerKeyTypeEd25519SignedPayload'], modern: 'Ed25519SignedPayload', arm: 'ed25519SignedPayload', convert: structConverter(_SignerKeyEd25519SignedPayload) },
   ],
 });
 export const SignerKey = _SignerKey as unknown as {
@@ -3810,7 +3838,7 @@ const _Claimant = createCompatUnion({
   codec: modern.Claimant,
   switchEnum: _ClaimantType,
   arms: [
-    { switchValues: ['claimantTypeV0'], modern: 'ClaimantTypeV0', arm: 'v0', convert: id },
+    { switchValues: ['claimantTypeV0'], modern: 'ClaimantTypeV0', arm: 'v0', convert: structConverter(_ClaimantV0) },
   ],
 });
 export const Claimant = _Claimant as unknown as {
@@ -3990,7 +4018,7 @@ const _TrustLineAsset = createCompatUnion({
     { switchValues: ['assetTypeNative'], modern: 'Native' },
     { switchValues: ['assetTypeCreditAlphanum4'], modern: 'CreditAlphanum4', arm: 'alphaNum4', convert: structConverter(_AlphaNum4) },
     { switchValues: ['assetTypeCreditAlphanum12'], modern: 'CreditAlphanum12', arm: 'alphaNum12', convert: structConverter(_AlphaNum12) },
-    { switchValues: ['assetTypePoolShare'], modern: 'PoolShare', arm: 'liquidityPoolId', convert: id },
+    { switchValues: ['assetTypePoolShare'], modern: 'PoolShare', arm: 'liquidityPoolId', convert: bufferConv },
   ],
 });
 export const TrustLineAsset = _TrustLineAsset as unknown as {
@@ -4119,7 +4147,7 @@ export interface LedgerKeyLiquidityPool {
 const _LedgerKeyLiquidityPool = createCompatStruct({
   codec: modern.LedgerKeyLiquidityPool,
   fields: [
-    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: id },
+    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: bufferConv },
   ],
 });
 export const LedgerKeyLiquidityPool = _LedgerKeyLiquidityPool as unknown as {
@@ -4271,16 +4299,16 @@ const _LedgerKey = createCompatUnion({
   codec: modern.LedgerKey,
   switchEnum: _LedgerEntryType,
   arms: [
-    { switchValues: ['account'], modern: 'Account', arm: 'account', convert: id },
-    { switchValues: ['trustline'], modern: 'Trustline', arm: 'trustLine', convert: id },
-    { switchValues: ['offer'], modern: 'Offer', arm: 'offer', convert: id },
-    { switchValues: ['data'], modern: 'Data', arm: 'data', convert: id },
-    { switchValues: ['claimableBalance'], modern: 'ClaimableBalance', arm: 'claimableBalance', convert: id },
-    { switchValues: ['liquidityPool'], modern: 'LiquidityPool', arm: 'liquidityPool', convert: id },
-    { switchValues: ['contractData'], modern: 'ContractData', arm: 'contractData', convert: id },
-    { switchValues: ['contractCode'], modern: 'ContractCode', arm: 'contractCode', convert: id },
-    { switchValues: ['configSetting'], modern: 'ConfigSetting', arm: 'configSetting', convert: id },
-    { switchValues: ['ttl'], modern: 'Ttl', arm: 'ttl', convert: id },
+    { switchValues: ['account'], modern: 'Account', arm: 'account', convert: structConverter(_LedgerKeyAccount) },
+    { switchValues: ['trustline'], modern: 'Trustline', arm: 'trustLine', convert: structConverter(_LedgerKeyTrustLine) },
+    { switchValues: ['offer'], modern: 'Offer', arm: 'offer', convert: structConverter(_LedgerKeyOffer) },
+    { switchValues: ['data'], modern: 'Data', arm: 'data', convert: structConverter(_LedgerKeyData) },
+    { switchValues: ['claimableBalance'], modern: 'ClaimableBalance', arm: 'claimableBalance', convert: structConverter(_LedgerKeyClaimableBalance) },
+    { switchValues: ['liquidityPool'], modern: 'LiquidityPool', arm: 'liquidityPool', convert: structConverter(_LedgerKeyLiquidityPool) },
+    { switchValues: ['contractData'], modern: 'ContractData', arm: 'contractData', convert: structConverter(_LedgerKeyContractData) },
+    { switchValues: ['contractCode'], modern: 'ContractCode', arm: 'contractCode', convert: structConverter(_LedgerKeyContractCode) },
+    { switchValues: ['configSetting'], modern: 'ConfigSetting', arm: 'configSetting', convert: structConverter(_LedgerKeyConfigSetting) },
+    { switchValues: ['ttl'], modern: 'Ttl', arm: 'ttl', convert: structConverter(_LedgerKeyTtl) },
   ],
 });
 export const LedgerKey = _LedgerKey as unknown as {
@@ -4344,7 +4372,7 @@ const _RevokeSponsorshipOp = createCompatUnion({
   switchEnum: _RevokeSponsorshipType,
   arms: [
     { switchValues: ['revokeSponsorshipLedgerEntry'], modern: 'LedgerEntry', arm: 'ledgerKey', convert: unionConverter(_LedgerKey) },
-    { switchValues: ['revokeSponsorshipSigner'], modern: 'Signer', arm: 'signer', convert: id },
+    { switchValues: ['revokeSponsorshipSigner'], modern: 'Signer', arm: 'signer', convert: structConverter(_RevokeSponsorshipOpSigner) },
   ],
 });
 export const RevokeSponsorshipOp = _RevokeSponsorshipOp as unknown as {
@@ -4455,7 +4483,7 @@ export interface LiquidityPoolDepositOp {
 const _LiquidityPoolDepositOp = createCompatStruct({
   codec: modern.LiquidityPoolDepositOp,
   fields: [
-    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: id },
+    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: bufferConv },
     { name: 'maxAmountA', modernName: 'maxAmountA', convert: int64Conv },
     { name: 'maxAmountB', modernName: 'maxAmountB', convert: int64Conv },
     { name: 'minPrice', modernName: 'minPrice', convert: structConverter(_Price) },
@@ -4486,7 +4514,7 @@ export interface LiquidityPoolWithdrawOp {
 const _LiquidityPoolWithdrawOp = createCompatStruct({
   codec: modern.LiquidityPoolWithdrawOp,
   fields: [
-    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: id },
+    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: bufferConv },
     { name: 'amount', modernName: 'amount', convert: int64Conv },
     { name: 'minAmountA', modernName: 'minAmountA', convert: int64Conv },
     { name: 'minAmountB', modernName: 'minAmountB', convert: int64Conv },
@@ -4607,7 +4635,7 @@ const _ContractIdPreimage = createCompatUnion({
   codec: modern.ContractIDPreimage,
   switchEnum: _ContractIdPreimageType,
   arms: [
-    { switchValues: ['contractIdPreimageFromAddress'], modern: 'Address', arm: 'fromAddress', convert: id },
+    { switchValues: ['contractIdPreimageFromAddress'], modern: 'Address', arm: 'fromAddress', convert: structConverter(_ContractIdPreimageFromAddress) },
     { switchValues: ['contractIdPreimageFromAsset'], modern: 'Asset', arm: 'fromAsset', convert: unionConverter(_Asset) },
   ],
 });
@@ -5082,7 +5110,7 @@ const _Operation = createCompatStruct({
   codec: modern.Operation,
   fields: [
     { name: 'sourceAccount', modernName: 'sourceAccount', convert: optionConverter(unionConverter(_MuxedAccount)) },
-    { name: 'body', modernName: 'body', convert: id },
+    { name: 'body', modernName: 'body', convert: unionConverter(_OperationBody) },
   ],
 });
 export const Operation = _Operation as unknown as {
@@ -5146,7 +5174,7 @@ const _TransactionV0 = createCompatStruct({
     { name: 'timeBounds', modernName: 'timeBounds', convert: optionConverter(structConverter(_TimeBounds)) },
     { name: 'memo', modernName: 'memo', convert: unionConverter(_Memo) },
     { name: 'operations', modernName: 'operations', convert: arrayConverter(structConverter(_Operation)) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TransactionV0Ext) },
   ],
 });
 export const TransactionV0 = _TransactionV0 as unknown as {
@@ -5174,8 +5202,8 @@ export interface DecoratedSignature {
 const _DecoratedSignature = createCompatStruct({
   codec: modern.DecoratedSignature,
   fields: [
-    { name: 'hint', modernName: 'hint', convert: id },
-    { name: 'signature', modernName: 'signature', convert: id },
+    { name: 'hint', modernName: 'hint', convert: bufferConv },
+    { name: 'signature', modernName: 'signature', convert: bufferConv },
   ],
 });
 export const DecoratedSignature = _DecoratedSignature as unknown as {
@@ -5446,7 +5474,7 @@ export interface SorobanTransactionData {
 const _SorobanTransactionData = createCompatStruct({
   codec: modern.SorobanTransactionData,
   fields: [
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_SorobanTransactionDataExt) },
     { name: 'resources', modernName: 'resources', convert: structConverter(_SorobanResources) },
     { name: 'resourceFee', modernName: 'resourceFee', convert: int64Conv },
   ],
@@ -5513,7 +5541,7 @@ const _Transaction = createCompatStruct({
     { name: 'cond', modernName: 'cond', convert: unionConverter(_Preconditions) },
     { name: 'memo', modernName: 'memo', convert: unionConverter(_Memo) },
     { name: 'operations', modernName: 'operations', convert: arrayConverter(structConverter(_Operation)) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TransactionExt) },
   ],
 });
 export const Transaction = _Transaction as unknown as {
@@ -5621,8 +5649,8 @@ const _FeeBumpTransaction = createCompatStruct({
   fields: [
     { name: 'feeSource', modernName: 'feeSource', convert: unionConverter(_MuxedAccount) },
     { name: 'fee', modernName: 'fee', convert: int64Conv },
-    { name: 'innerTx', modernName: 'innerTx', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'innerTx', modernName: 'innerTx', convert: unionConverter(_FeeBumpTransactionInnerTx) },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_FeeBumpTransactionExt) },
   ],
 });
 export const FeeBumpTransaction = _FeeBumpTransaction as unknown as {
@@ -6056,7 +6084,7 @@ export interface ClaimLiquidityAtom {
 const _ClaimLiquidityAtom = createCompatStruct({
   codec: modern.ClaimLiquidityAtom,
   fields: [
-    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: id },
+    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: bufferConv },
     { name: 'assetSold', modernName: 'assetSold', convert: unionConverter(_Asset) },
     { name: 'amountSold', modernName: 'amountSold', convert: int64Conv },
     { name: 'assetBought', modernName: 'assetBought', convert: unionConverter(_Asset) },
@@ -6175,7 +6203,7 @@ const _PathPaymentStrictReceiveResult = createCompatUnion({
   codec: modern.PathPaymentStrictReceiveResult,
   switchEnum: _PathPaymentStrictReceiveResultCode,
   arms: [
-    { switchValues: ['pathPaymentStrictReceiveSuccess'], modern: 'Success', arm: 'success', convert: id },
+    { switchValues: ['pathPaymentStrictReceiveSuccess'], modern: 'Success', arm: 'success', convert: structConverter(_PathPaymentStrictReceiveResultSuccess) },
     { switchValues: ['pathPaymentStrictReceiveMalformed', 'pathPaymentStrictReceiveUnderfunded', 'pathPaymentStrictReceiveSrcNoTrust', 'pathPaymentStrictReceiveSrcNotAuthorized', 'pathPaymentStrictReceiveNoDestination', 'pathPaymentStrictReceiveNoTrust', 'pathPaymentStrictReceiveNotAuthorized', 'pathPaymentStrictReceiveLineFull'], modern: 'Malformed' },
     { switchValues: ['pathPaymentStrictReceiveNoIssuer'], modern: 'NoIssuer', arm: 'noIssuer', convert: unionConverter(_Asset) },
     { switchValues: ['pathPaymentStrictReceiveTooFewOffers', 'pathPaymentStrictReceiveOfferCrossSelf', 'pathPaymentStrictReceiveOverSendmax'], modern: 'TooFewOffers' },
@@ -6310,7 +6338,7 @@ const _OfferEntry = createCompatStruct({
     { name: 'amount', modernName: 'amount', convert: int64Conv },
     { name: 'price', modernName: 'price', convert: structConverter(_Price) },
     { name: 'flags', modernName: 'flags', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_OfferEntryExt) },
   ],
 });
 export const OfferEntry = _OfferEntry as unknown as {
@@ -6366,7 +6394,7 @@ const _ManageOfferSuccessResult = createCompatStruct({
   codec: modern.ManageOfferSuccessResult,
   fields: [
     { name: 'offersClaimed', modernName: 'offersClaimed', convert: arrayConverter(unionConverter(_ClaimAtom)) },
-    { name: 'offer', modernName: 'offer', convert: id },
+    { name: 'offer', modernName: 'offer', convert: unionConverter(_ManageOfferSuccessResultOffer) },
   ],
 });
 export const ManageOfferSuccessResult = _ManageOfferSuccessResult as unknown as {
@@ -7002,7 +7030,7 @@ const _PathPaymentStrictSendResult = createCompatUnion({
   codec: modern.PathPaymentStrictSendResult,
   switchEnum: _PathPaymentStrictSendResultCode,
   arms: [
-    { switchValues: ['pathPaymentStrictSendSuccess'], modern: 'Success', arm: 'success', convert: id },
+    { switchValues: ['pathPaymentStrictSendSuccess'], modern: 'Success', arm: 'success', convert: structConverter(_PathPaymentStrictSendResultSuccess) },
     { switchValues: ['pathPaymentStrictSendMalformed', 'pathPaymentStrictSendUnderfunded', 'pathPaymentStrictSendSrcNoTrust', 'pathPaymentStrictSendSrcNotAuthorized', 'pathPaymentStrictSendNoDestination', 'pathPaymentStrictSendNoTrust', 'pathPaymentStrictSendNotAuthorized', 'pathPaymentStrictSendLineFull'], modern: 'Malformed' },
     { switchValues: ['pathPaymentStrictSendNoIssuer'], modern: 'NoIssuer', arm: 'noIssuer', convert: unionConverter(_Asset) },
     { switchValues: ['pathPaymentStrictSendTooFewOffers', 'pathPaymentStrictSendOfferCrossSelf', 'pathPaymentStrictSendUnderDestmin'], modern: 'TooFewOffers' },
@@ -7846,7 +7874,7 @@ const _OperationResult = createCompatUnion({
   codec: modern.OperationResult,
   switchEnum: _OperationResultCode,
   arms: [
-    { switchValues: ['opInner'], modern: 'OpINNER', arm: 'tr', convert: id },
+    { switchValues: ['opInner'], modern: 'OpINNER', arm: 'tr', convert: unionConverter(_OperationResultTr) },
     { switchValues: ['opBadAuth', 'opNoAccount', 'opNotSupported', 'opTooManySubentries', 'opExceededWorkLimit', 'opTooManySponsoring'], modern: 'OpBADAuth' },
   ],
 });
@@ -7950,8 +7978,8 @@ const _InnerTransactionResult = createCompatStruct({
   codec: modern.InnerTransactionResult,
   fields: [
     { name: 'feeCharged', modernName: 'feeCharged', convert: int64Conv },
-    { name: 'result', modernName: 'result', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'result', modernName: 'result', convert: unionConverter(_InnerTransactionResultResult) },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_InnerTransactionResultExt) },
   ],
 });
 export const InnerTransactionResult = _InnerTransactionResult as unknown as {
@@ -8078,8 +8106,8 @@ const _TransactionResult = createCompatStruct({
   codec: modern.TransactionResult,
   fields: [
     { name: 'feeCharged', modernName: 'feeCharged', convert: int64Conv },
-    { name: 'result', modernName: 'result', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'result', modernName: 'result', convert: unionConverter(_TransactionResultResult) },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TransactionResultExt) },
   ],
 });
 export const TransactionResult = _TransactionResult as unknown as {
@@ -8248,7 +8276,7 @@ const _AccountEntryExtensionV2 = createCompatStruct({
     { name: 'numSponsored', modernName: 'numSponsored', convert: id },
     { name: 'numSponsoring', modernName: 'numSponsoring', convert: id },
     { name: 'signerSponsoringIDs', modernName: 'signerSponsoringIDs', convert: arrayConverter(optionConverter(unionConverter(_PublicKey))) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_AccountEntryExtensionV2Ext) },
   ],
 });
 export const AccountEntryExtensionV2 = _AccountEntryExtensionV2 as unknown as {
@@ -8303,7 +8331,7 @@ const _AccountEntryExtensionV1 = createCompatStruct({
   codec: modern.AccountEntryExtensionV1,
   fields: [
     { name: 'liabilities', modernName: 'liabilities', convert: structConverter(_Liabilities) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_AccountEntryExtensionV1Ext) },
   ],
 });
 export const AccountEntryExtensionV1 = _AccountEntryExtensionV1 as unknown as {
@@ -8374,7 +8402,7 @@ const _AccountEntry = createCompatStruct({
     { name: 'homeDomain', modernName: 'homeDomain', convert: id },
     { name: 'thresholds', modernName: 'thresholds', convert: id },
     { name: 'signers', modernName: 'signers', convert: arrayConverter(structConverter(_Signer)) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_AccountEntryExt) },
   ],
 });
 export const AccountEntry = _AccountEntry as unknown as {
@@ -8426,7 +8454,7 @@ const _TrustLineEntryExtensionV2 = createCompatStruct({
   codec: modern.TrustLineEntryExtensionV2,
   fields: [
     { name: 'liquidityPoolUseCount', modernName: 'liquidityPoolUseCount', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TrustLineEntryExtensionV2Ext) },
   ],
 });
 export const TrustLineEntryExtensionV2 = _TrustLineEntryExtensionV2 as unknown as {
@@ -8481,7 +8509,7 @@ const _TrustLineEntryV1 = createCompatStruct({
   codec: modern.TrustLineEntryV1,
   fields: [
     { name: 'liabilities', modernName: 'liabilities', convert: structConverter(_Liabilities) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TrustLineEntryV1Ext) },
   ],
 });
 export const TrustLineEntryV1 = _TrustLineEntryV1 as unknown as {
@@ -8509,7 +8537,7 @@ const _TrustLineEntryExt = createCompatUnion({
   switchEnum: null,
   arms: [
     { switchValues: [0], modern: 0 },
-    { switchValues: [1], modern: 1, arm: 'v1', convert: id },
+    { switchValues: [1], modern: 1, arm: 'v1', convert: structConverter(_TrustLineEntryV1) },
   ],
 });
 export const TrustLineEntryExt = _TrustLineEntryExt as unknown as {
@@ -8544,7 +8572,7 @@ const _TrustLineEntry = createCompatStruct({
     { name: 'balance', modernName: 'balance', convert: int64Conv },
     { name: 'limit', modernName: 'limit', convert: int64Conv },
     { name: 'flags', modernName: 'flags', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TrustLineEntryExt) },
   ],
 });
 export const TrustLineEntry = _TrustLineEntry as unknown as {
@@ -8600,7 +8628,7 @@ const _DataEntry = createCompatStruct({
     { name: 'accountId', modernName: 'accountID', convert: unionConverter(_PublicKey) },
     { name: 'dataName', modernName: 'dataName', convert: id },
     { name: 'dataValue', modernName: 'dataValue', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_DataEntryExt) },
   ],
 });
 export const DataEntry = _DataEntry as unknown as {
@@ -8651,7 +8679,7 @@ export interface ClaimableBalanceEntryExtensionV1 {
 const _ClaimableBalanceEntryExtensionV1 = createCompatStruct({
   codec: modern.ClaimableBalanceEntryExtensionV1,
   fields: [
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_ClaimableBalanceEntryExtensionV1Ext) },
     { name: 'flags', modernName: 'flags', convert: id },
   ],
 });
@@ -8713,7 +8741,7 @@ const _ClaimableBalanceEntry = createCompatStruct({
     { name: 'claimants', modernName: 'claimants', convert: arrayConverter(unionConverter(_Claimant)) },
     { name: 'asset', modernName: 'asset', convert: unionConverter(_Asset) },
     { name: 'amount', modernName: 'amount', convert: int64Conv },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_ClaimableBalanceEntryExt) },
   ],
 });
 export const ClaimableBalanceEntry = _ClaimableBalanceEntry as unknown as {
@@ -8772,7 +8800,7 @@ const _LiquidityPoolEntryBody = createCompatUnion({
   codec: modern.LiquidityPoolEntryBody,
   switchEnum: _LiquidityPoolType,
   arms: [
-    { switchValues: ['liquidityPoolConstantProduct'], modern: 'LiquidityPoolConstantProduct', arm: 'constantProduct', convert: id },
+    { switchValues: ['liquidityPoolConstantProduct'], modern: 'LiquidityPoolConstantProduct', arm: 'constantProduct', convert: structConverter(_LiquidityPoolEntryConstantProduct) },
   ],
 });
 export const LiquidityPoolEntryBody = _LiquidityPoolEntryBody as unknown as {
@@ -8797,8 +8825,8 @@ export interface LiquidityPoolEntry {
 const _LiquidityPoolEntry = createCompatStruct({
   codec: modern.LiquidityPoolEntry,
   fields: [
-    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: id },
-    { name: 'body', modernName: 'body', convert: id },
+    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: bufferConv },
+    { name: 'body', modernName: 'body', convert: unionConverter(_LiquidityPoolEntryBody) },
   ],
 });
 export const LiquidityPoolEntry = _LiquidityPoolEntry as unknown as {
@@ -8928,7 +8956,7 @@ const _ContractCodeEntryExt = createCompatUnion({
   switchEnum: null,
   arms: [
     { switchValues: [0], modern: 0 },
-    { switchValues: [1], modern: 1, arm: 'v1', convert: id },
+    { switchValues: [1], modern: 1, arm: 'v1', convert: structConverter(_ContractCodeEntryV1) },
   ],
 });
 export const ContractCodeEntryExt = _ContractCodeEntryExt as unknown as {
@@ -8955,7 +8983,7 @@ export interface ContractCodeEntry {
 const _ContractCodeEntry = createCompatStruct({
   codec: modern.ContractCodeEntry,
   fields: [
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_ContractCodeEntryExt) },
     { name: 'hash', modernName: 'hash', convert: id },
     { name: 'code', modernName: 'code', convert: id },
   ],
@@ -9089,7 +9117,7 @@ const _LedgerEntryExtensionV1 = createCompatStruct({
   codec: modern.LedgerEntryExtensionV1,
   fields: [
     { name: 'sponsoringId', modernName: 'sponsoringID', convert: optionConverter(unionConverter(_PublicKey)) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_LedgerEntryExtensionV1Ext) },
   ],
 });
 export const LedgerEntryExtensionV1 = _LedgerEntryExtensionV1 as unknown as {
@@ -9145,8 +9173,8 @@ const _LedgerEntry = createCompatStruct({
   codec: modern.LedgerEntry,
   fields: [
     { name: 'lastModifiedLedgerSeq', modernName: 'lastModifiedLedgerSeq', convert: id },
-    { name: 'data', modernName: 'data', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'data', modernName: 'data', convert: unionConverter(_LedgerEntryData) },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_LedgerEntryExt) },
   ],
 });
 export const LedgerEntry = _LedgerEntry as unknown as {
@@ -9396,7 +9424,7 @@ const _ContractEventBody = createCompatUnion({
   codec: modern.ContractEventBody,
   switchEnum: null,
   arms: [
-    { switchValues: [0], modern: 0, arm: 'v0', convert: id },
+    { switchValues: [0], modern: 0, arm: 'v0', convert: structConverter(_ContractEventV0) },
   ],
 });
 export const ContractEventBody = _ContractEventBody as unknown as {
@@ -9426,7 +9454,7 @@ const _ContractEvent = createCompatStruct({
     { name: 'ext', modernName: 'ext', convert: unionConverter(_ExtensionPoint) },
     { name: 'contractId', modernName: 'contractID', convert: optionConverter(id) },
     { name: 'type', modernName: 'type', convert: enumConverter(_ContractEventType) },
-    { name: 'body', modernName: 'body', convert: id },
+    { name: 'body', modernName: 'body', convert: unionConverter(_ContractEventBody) },
   ],
 });
 export const ContractEvent = _ContractEvent as unknown as {
@@ -10067,9 +10095,9 @@ const _ScpStatementPledges = createCompatUnion({
   codec: modern.SCPStatementPledges,
   switchEnum: _ScpStatementType,
   arms: [
-    { switchValues: ['scpStPrepare'], modern: 'Prepare', arm: 'prepare', convert: id },
-    { switchValues: ['scpStConfirm'], modern: 'Confirm', arm: 'confirm', convert: id },
-    { switchValues: ['scpStExternalize'], modern: 'Externalize', arm: 'externalize', convert: id },
+    { switchValues: ['scpStPrepare'], modern: 'Prepare', arm: 'prepare', convert: structConverter(_ScpStatementPrepare) },
+    { switchValues: ['scpStConfirm'], modern: 'Confirm', arm: 'confirm', convert: structConverter(_ScpStatementConfirm) },
+    { switchValues: ['scpStExternalize'], modern: 'Externalize', arm: 'externalize', convert: structConverter(_ScpStatementExternalize) },
     { switchValues: ['scpStNominate'], modern: 'Nominate', arm: 'nominate', convert: structConverter(_ScpNomination) },
   ],
 });
@@ -10101,7 +10129,7 @@ const _ScpStatement = createCompatStruct({
   fields: [
     { name: 'nodeId', modernName: 'nodeID', convert: unionConverter(_PublicKey) },
     { name: 'slotIndex', modernName: 'slotIndex', convert: uint64Conv },
-    { name: 'pledges', modernName: 'pledges', convert: id },
+    { name: 'pledges', modernName: 'pledges', convert: unionConverter(_ScpStatementPledges) },
   ],
 });
 export const ScpStatement = _ScpStatement as unknown as {
@@ -10360,7 +10388,7 @@ const _TxSetComponent = createCompatUnion({
   codec: modern.TxSetComponent,
   switchEnum: _TxSetComponentType,
   arms: [
-    { switchValues: ['txsetCompTxsMaybeDiscountedFee'], modern: 'TxsetCompTxsMaybeDiscountedFee', arm: 'txsMaybeDiscountedFee', convert: id },
+    { switchValues: ['txsetCompTxsMaybeDiscountedFee'], modern: 'TxsetCompTxsMaybeDiscountedFee', arm: 'txsMaybeDiscountedFee', convert: structConverter(_TxSetComponentTxsMaybeDiscountedFee) },
   ],
 });
 export const TxSetComponent = _TxSetComponent as unknown as {
@@ -10997,7 +11025,7 @@ const _BucketMetadata = createCompatStruct({
   codec: modern.BucketMetadata,
   fields: [
     { name: 'ledgerVersion', modernName: 'ledgerVersion', convert: id },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_BucketMetadataExt) },
   ],
 });
 export const BucketMetadata = _BucketMetadata as unknown as {
@@ -11189,7 +11217,7 @@ const _TransactionHistoryEntry = createCompatStruct({
   fields: [
     { name: 'ledgerSeq', modernName: 'ledgerSeq', convert: id },
     { name: 'txSet', modernName: 'txSet', convert: structConverter(_TransactionSet) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TransactionHistoryEntryExt) },
   ],
 });
 export const TransactionHistoryEntry = _TransactionHistoryEntry as unknown as {
@@ -11243,7 +11271,7 @@ const _TransactionHistoryResultEntry = createCompatStruct({
   fields: [
     { name: 'ledgerSeq', modernName: 'ledgerSeq', convert: id },
     { name: 'txResultSet', modernName: 'txResultSet', convert: structConverter(_TransactionResultSet) },
-    { name: 'ext', modernName: 'ext', convert: id },
+    { name: 'ext', modernName: 'ext', convert: unionConverter(_TransactionHistoryResultEntryExt) },
   ],
 });
 export const TransactionHistoryResultEntry = _TransactionHistoryResultEntry as unknown as {
@@ -11557,7 +11585,7 @@ export interface PeerAddress {
 const _PeerAddress = createCompatStruct({
   codec: modern.PeerAddress,
   fields: [
-    { name: 'ip', modernName: 'ip', convert: id },
+    { name: 'ip', modernName: 'ip', convert: unionConverter(_PeerAddressIp) },
     { name: 'port', modernName: 'port', convert: id },
     { name: 'numFailures', modernName: 'numFailures', convert: id },
   ],
@@ -12352,7 +12380,7 @@ const _AuthenticatedMessage = createCompatUnion({
   codec: modern.AuthenticatedMessage,
   switchEnum: null,
   arms: [
-    { switchValues: [0], modern: 0, arm: 'v0', convert: id },
+    { switchValues: [0], modern: 0, arm: 'v0', convert: structConverter(_AuthenticatedMessageV0) },
   ],
 });
 export const AuthenticatedMessage = _AuthenticatedMessage as unknown as {
@@ -12416,7 +12444,7 @@ const _HashIdPreimageRevokeId = createCompatStruct({
     { name: 'sourceAccount', modernName: 'sourceAccount', convert: unionConverter(_PublicKey) },
     { name: 'seqNum', modernName: 'seqNum', convert: int64Conv },
     { name: 'opNum', modernName: 'opNum', convert: id },
-    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: id },
+    { name: 'liquidityPoolId', modernName: 'liquidityPoolID', convert: bufferConv },
     { name: 'asset', modernName: 'asset', convert: unionConverter(_Asset) },
   ],
 });
@@ -12503,10 +12531,10 @@ const _HashIdPreimage = createCompatUnion({
   codec: modern.HashIDPreimage,
   switchEnum: _EnvelopeType,
   arms: [
-    { switchValues: ['envelopeTypeOpId'], modern: 'OpId', arm: 'operationId', convert: id },
-    { switchValues: ['envelopeTypePoolRevokeOpId'], modern: 'PoolRevokeOpId', arm: 'revokeId', convert: id },
-    { switchValues: ['envelopeTypeContractId'], modern: 'ContractId', arm: 'contractId', convert: id },
-    { switchValues: ['envelopeTypeSorobanAuthorization'], modern: 'SorobanAuthorization', arm: 'sorobanAuthorization', convert: id },
+    { switchValues: ['envelopeTypeOpId'], modern: 'OpId', arm: 'operationId', convert: structConverter(_HashIdPreimageOperationId) },
+    { switchValues: ['envelopeTypePoolRevokeOpId'], modern: 'PoolRevokeOpId', arm: 'revokeId', convert: structConverter(_HashIdPreimageRevokeId) },
+    { switchValues: ['envelopeTypeContractId'], modern: 'ContractId', arm: 'contractId', convert: structConverter(_HashIdPreimageContractId) },
+    { switchValues: ['envelopeTypeSorobanAuthorization'], modern: 'SorobanAuthorization', arm: 'sorobanAuthorization', convert: structConverter(_HashIdPreimageSorobanAuthorization) },
   ],
 });
 export const HashIdPreimage = _HashIdPreimage as unknown as {
@@ -12565,7 +12593,7 @@ const _TransactionSignaturePayload = createCompatStruct({
   codec: modern.TransactionSignaturePayload,
   fields: [
     { name: 'networkId', modernName: 'networkId', convert: id },
-    { name: 'taggedTransaction', modernName: 'taggedTransaction', convert: id },
+    { name: 'taggedTransaction', modernName: 'taggedTransaction', convert: unionConverter(_TransactionSignaturePayloadTaggedTransaction) },
   ],
 });
 export const TransactionSignaturePayload = _TransactionSignaturePayload as unknown as {

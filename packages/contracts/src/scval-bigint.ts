@@ -13,6 +13,8 @@ export function scValToBigInt(scv: any): bigint {
   if (typeof scv?.switch === 'function' && typeof scv?._toModern === 'function') {
     scv = scv._toModern();
   }
+  if (is(scv, 'U32')) return BigInt(scv.U32);
+  if (is(scv, 'I32')) return BigInt(scv.I32);
   if (is(scv, 'U64')) return scv.U64;
   if (is(scv, 'I64')) return scv.I64;
   if (is(scv, 'Timepoint')) return scv.Timepoint;

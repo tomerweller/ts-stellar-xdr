@@ -44,41 +44,49 @@ describe('Contract', () => {
   });
 
   describe('call()', () => {
-    it('creates an invocation ScVal', () => {
+    it('creates an invocation Operation', () => {
       const c = new Contract(CONTRACT_ID);
+      // call() now returns a compat Operation struct
       const result = c.call('transfer', { U32: 100 });
       expect(result).toBeDefined();
-      expect('Vec' in result).toBe(true);
-      const vec = result.Vec;
-      expect(vec.length).toBe(3);
-      // First element: contract address
-      expect('Address' in vec[0]).toBe(true);
-      // Second element: method name
-      expect(vec[1]).toEqual({ Symbol: 'transfer' });
-      // Third element: arg
-      expect(vec[2]).toEqual({ U32: 100 });
+      expect(typeof result._toModern).toBe('function');
+      // Verify it's an Operation with InvokeHostFunction body
+      const modern = result._toModern();
+      expect('InvokeHostFunction' in modern.body).toBe(true);
+      const ihf = modern.body.InvokeHostFunction;
+      expect('InvokeContract' in ihf.hostFunction).toBe(true);
+      const ic = ihf.hostFunction.InvokeContract;
+      expect(ic.functionName).toBe('transfer');
+      expect(ic.args.length).toBe(1);
     });
 
     it('creates with no args', () => {
       const c = new Contract(CONTRACT_ID);
       const result = c.call('get_balance');
-      expect(result.Vec.length).toBe(2);
+      const modern = result._toModern();
+      const ic = modern.body.InvokeHostFunction.hostFunction.InvokeContract;
+      expect(ic.args.length).toBe(0);
     });
 
     it('creates with multiple args', () => {
       const c = new Contract(CONTRACT_ID);
       const result = c.call('transfer', { U32: 100 }, { Bool: true });
-      expect(result.Vec.length).toBe(4);
+      const modern = result._toModern();
+      const ic = modern.body.InvokeHostFunction.hostFunction.InvokeContract;
+      expect(ic.args.length).toBe(2);
     });
   });
 
   describe('getFootprint()', () => {
-    it('returns a LedgerKey-like object', () => {
+    it('returns a LedgerKey-like compat object', () => {
       const c = new Contract(CONTRACT_ID);
       const fp = c.getFootprint();
       expect(fp).toBeDefined();
-      expect('ContractData' in fp).toBe(true);
-      expect('Contract' in fp.ContractData.contract).toBe(true);
+      // Returns compat object with switch() method
+      expect(typeof fp.switch).toBe('function');
+      const modern = fp._toModern();
+      expect('ContractData' in modern).toBe(true);
+      expect('Contract' in modern.ContractData.contract).toBe(true);
     });
   });
 });

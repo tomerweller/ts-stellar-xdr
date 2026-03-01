@@ -10,10 +10,25 @@ import {
   decodeBase64,
 } from '@stellar/xdr';
 
+import {
+  SorobanTransactionData as CompatSorobanTransactionData,
+  LedgerKey as CompatLedgerKey,
+} from './generated/stellar_compat.js';
+
+function toModernData(data: any): SorobanTransactionData {
+  if (typeof data?._toModern === 'function') return data._toModern();
+  return data;
+}
+
+function toModernKey(key: any): LedgerKey {
+  if (typeof key?._toModern === 'function') return key._toModern();
+  return key;
+}
+
 export class SorobanDataBuilder {
   private _data: SorobanTransactionData;
 
-  constructor(data?: string | SorobanTransactionData) {
+  constructor(data?: string | any) {
     if (!data) {
       this._data = {
         ext: '0',
@@ -28,47 +43,82 @@ export class SorobanDataBuilder {
     } else if (typeof data === 'string') {
       this._data = SorobanTransactionDataCodec.fromBase64(data);
     } else {
-      this._data = { ...data };
+      // Accept both modern and compat SorobanTransactionData
+      this._data = toModernData(data);
     }
   }
 
-  setFootprint(readOnly: LedgerKey[], readWrite: LedgerKey[]): this {
-    this._data = {
-      ...this._data,
-      resources: {
-        ...this._data.resources,
-        footprint: { readOnly, readWrite },
-      },
-    };
-    return this;
-  }
-
-  setReadOnly(readOnly: LedgerKey[]): this {
+  setFootprint(readOnly: any[] | null, readWrite: any[] | null): this {
     this._data = {
       ...this._data,
       resources: {
         ...this._data.resources,
         footprint: {
-          ...this._data.resources.footprint,
-          readOnly,
+          readOnly: readOnly !== null ? readOnly.map(toModernKey) : this._data.resources.footprint.readOnly,
+          readWrite: readWrite !== null ? readWrite.map(toModernKey) : this._data.resources.footprint.readWrite,
         },
       },
     };
     return this;
   }
 
-  setReadWrite(readWrite: LedgerKey[]): this {
+  appendFootprint(readOnly: any[] | null, readWrite: any[] | null): this {
+    const existing = this._data.resources.footprint;
+    this._data = {
+      ...this._data,
+      resources: {
+        ...this._data.resources,
+        footprint: {
+          readOnly: readOnly !== null
+            ? [...existing.readOnly, ...readOnly.map(toModernKey)]
+            : existing.readOnly,
+          readWrite: readWrite !== null
+            ? [...existing.readWrite, ...readWrite.map(toModernKey)]
+            : existing.readWrite,
+        },
+      },
+    };
+    return this;
+  }
+
+  setReadOnly(readOnly: any[]): this {
     this._data = {
       ...this._data,
       resources: {
         ...this._data.resources,
         footprint: {
           ...this._data.resources.footprint,
-          readWrite,
+          readOnly: readOnly.map(toModernKey),
         },
       },
     };
     return this;
+  }
+
+  setReadWrite(readWrite: any[]): this {
+    this._data = {
+      ...this._data,
+      resources: {
+        ...this._data.resources,
+        footprint: {
+          ...this._data.resources.footprint,
+          readWrite: readWrite.map(toModernKey),
+        },
+      },
+    };
+    return this;
+  }
+
+  getReadOnly(): any[] {
+    return this._data.resources.footprint.readOnly.map(
+      k => (CompatLedgerKey as any)._fromModern(k)
+    );
+  }
+
+  getReadWrite(): any[] {
+    return this._data.resources.footprint.readWrite.map(
+      k => (CompatLedgerKey as any)._fromModern(k)
+    );
   }
 
   setResources(instructions: number, diskReadBytes: number, writeBytes: number): this {
@@ -92,7 +142,14 @@ export class SorobanDataBuilder {
     return this;
   }
 
-  build(): SorobanTransactionData {
-    return this._data;
+  build(): any {
+    // Return a deep copy wrapped as compat struct
+    const copy: SorobanTransactionData = JSON.parse(JSON.stringify(this._data, (_k, v) =>
+      typeof v === 'bigint' ? `__bigint__${v}` : v
+    ), (_k, v) =>
+      typeof v === 'string' && v.startsWith('__bigint__') ? BigInt(v.slice(10)) : v
+    );
+    // Restore Uint8Array from arrays if needed
+    return (CompatSorobanTransactionData as any)._fromModern(this._data);
   }
 }

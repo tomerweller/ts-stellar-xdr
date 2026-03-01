@@ -8,6 +8,10 @@ export {
   optionConverter,
   arrayConverter,
   lazyConverter,
+  opaqueStringConv,
+  structConverter,
+  unionConverter,
+  enumConverter,
 } from './converters.js';
 export { createCompatStruct, type CompatStructConfig, type StructFieldConfig } from './struct.js';
 export { createCompatEnum, type CompatEnumConfig, type EnumMemberConfig } from './enum.js';

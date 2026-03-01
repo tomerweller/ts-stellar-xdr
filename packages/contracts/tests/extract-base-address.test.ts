@@ -13,12 +13,12 @@ describe('extractBaseAddress', () => {
   });
 
   it('extracts G-address from M-address', () => {
-    // Muxed payload: 8 bytes ID + 32 bytes ed25519 key
+    // Muxed payload: 32 bytes ed25519 key + 8 bytes ID
     const muxedPayload = new Uint8Array(40);
-    // Set ID bytes (first 8 bytes)
-    muxedPayload[7] = 1; // id = 1
-    // Set ed25519 key bytes (remaining 32 bytes)
-    muxedPayload.set(pubKeyBytes, 8);
+    // Set ed25519 key bytes (first 32 bytes)
+    muxedPayload.set(pubKeyBytes, 0);
+    // Set ID bytes (last 8 bytes)
+    muxedPayload[39] = 1; // id = 1
 
     const mAddress = encodeStrkey(STRKEY_MUXED_ED25519, muxedPayload);
     expect(mAddress).toMatch(/^M/);

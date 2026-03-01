@@ -99,7 +99,8 @@ describe('Memo', () => {
       hash.fill(10);
       const m = Memo.hash(hash);
       expect(m.type).toBe('hash');
-      expect(m.value).toEqual(hash);
+      // Memo.hash now stores as Buffer/augmented Uint8Array, compare via hex
+      expect(toHex(m.value as Uint8Array)).toBe(toHex(hash));
     });
 
     it('creates hash memo from hex string', () => {

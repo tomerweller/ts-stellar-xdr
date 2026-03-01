@@ -16,6 +16,7 @@ import {
 import {
   Asset as CompatAssetXdr,
   ChangeTrustAsset as CompatChangeTrustAsset,
+  TrustLineAsset as CompatTrustLineAsset,
 } from './generated/stellar_compat.js';
 import { getAssetContractId } from '@stellar/contracts';
 
@@ -48,9 +49,9 @@ export class Asset {
     }
   }
 
-  static native(): Asset {
+  static native: () => Asset = function() {
     return new Asset('XLM');
-  }
+  } as any;
 
   isNative(): boolean {
     return this._issuer === null;
@@ -93,6 +94,10 @@ export class Asset {
     return (CompatChangeTrustAsset as any)._fromModern(this._toModern());
   }
 
+  toTrustLineXDRObject(): any {
+    return (CompatTrustLineAsset as any)._fromModern(this._toModern());
+  }
+
   static fromOperation(xdrAsset: any): Asset {
     const modern: ModernAsset = xdrAsset._toModern();
     return Asset._fromModern(modern);
@@ -133,7 +138,9 @@ export class Asset {
     return Asset.compare(this, other);
   }
 
-  static compare(a: Asset, b: Asset): number {
+  static compare(a?: any, b?: any): number {
+    if (!(a instanceof Asset)) throw new Error('assetA is invalid');
+    if (!(b instanceof Asset)) throw new Error('assetB is invalid');
     if (a.isNative() && b.isNative()) return 0;
     if (a.isNative()) return -1;
     if (b.isNative()) return 1;

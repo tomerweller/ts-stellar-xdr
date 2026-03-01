@@ -1,4 +1,13 @@
 import type { XdrCodec } from '@stellar/xdr';
+import { augmentBuffer } from '../signing.js';
+
+/** Augment a value with Buffer-like methods if it's a Uint8Array. */
+export function augmentIfBuffer(val: any): any {
+  if (val instanceof Uint8Array && typeof (val as any).equals !== 'function') {
+    return augmentBuffer(val);
+  }
+  return val;
+}
 
 /**
  * Base class for all compat XDR types. Provides toXDR/fromXDR/validateXDR
@@ -13,8 +22,13 @@ export abstract class XdrTypeBase {
   toXDR(format?: string): Uint8Array | string {
     const codec = (this.constructor as any)._codec as XdrCodec<any>;
     const modern = this._toModern();
-    const bytes = codec.toXdr(modern);
-    if (!format || format === 'raw') return bytes;
+    let bytes: Uint8Array;
+    try {
+      bytes = codec.toXdr(modern);
+    } catch (e: any) {
+      throw new Error(`XDR Write Error: ${e?.message ?? e}`);
+    }
+    if (!format || format === 'raw') return augmentBuffer(bytes);
     if (format === 'hex') return bytesToHex(bytes);
     if (format === 'base64') return codec.toBase64(modern);
     throw new Error(`Unknown format: ${format}`);

@@ -440,8 +440,9 @@ describe('Operations', () => {
 
   describe('claimClaimableBalance', () => {
     it('creates valid operation', () => {
+      // Balance ID is now 72-char hex: 8-char type prefix (00000000) + 64-char hash
       const balanceId =
-        '0000000000000000000000000000000000000000000000000000000000000000';
+        '000000000000000000000000000000000000000000000000000000000000000000000000';
       const op = Operation.claimClaimableBalance({ balanceId });
       const tx = roundtrip(op);
       expect(tx.operations.length).toBe(1);
@@ -486,8 +487,9 @@ describe('Operations', () => {
 
   describe('clawbackClaimableBalance', () => {
     it('creates valid operation', () => {
+      // Balance ID is now 72-char hex: 8-char type prefix (00000000) + 64-char hash
       const balanceId =
-        '0000000000000000000000000000000000000000000000000000000000000000';
+        '000000000000000000000000000000000000000000000000000000000000000000000000';
       const op = Operation.clawbackClaimableBalance({ balanceId });
       const tx = roundtrip(op);
       expect(tx.operations.length).toBe(1);
@@ -591,9 +593,10 @@ describe('Operations', () => {
     });
 
     it('fromStroops converts correctly', () => {
-      expect(Operation.fromStroops('10000000')).toBe('1');
-      expect(Operation.fromStroops('5000000')).toBe('0.5');
-      expect(Operation.fromStroops('1001230000')).toBe('100.123');
+      // fromStroops now always returns 7 decimal places
+      expect(Operation.fromStroops('10000000')).toBe('1.0000000');
+      expect(Operation.fromStroops('5000000')).toBe('0.5000000');
+      expect(Operation.fromStroops('1001230000')).toBe('100.1230000');
     });
   });
 

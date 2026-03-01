@@ -8,115 +8,139 @@ const CONTRACT = 'CA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAXE';
 describe('nativeToScVal', () => {
   describe('with explicit type', () => {
     it('bool', () => {
-      expect(nativeToScVal(true, { type: 'bool' })).toEqual({ Bool: true });
-      expect(nativeToScVal(false, { type: 'bool' })).toEqual({ Bool: false });
+      const r1 = nativeToScVal(true, { type: 'bool' });
+      expect(r1._toModern()).toEqual({ Bool: true });
+      const r2 = nativeToScVal(false, { type: 'bool' });
+      expect(r2._toModern()).toEqual({ Bool: false });
     });
 
     it('void', () => {
-      expect(nativeToScVal(null, { type: 'void' })).toBe('Void');
+      const r = nativeToScVal(null, { type: 'void' });
+      expect(r._toModern()).toBe('Void');
     });
 
     it('u32', () => {
-      expect(nativeToScVal(42, { type: 'u32' })).toEqual({ U32: 42 });
+      const r = nativeToScVal(42, { type: 'u32' });
+      expect(r._toModern()).toEqual({ U32: 42 });
     });
 
     it('i32', () => {
-      expect(nativeToScVal(-10, { type: 'i32' })).toEqual({ I32: -10 });
+      const r = nativeToScVal(-10, { type: 'i32' });
+      expect(r._toModern()).toEqual({ I32: -10 });
     });
 
     it('u64', () => {
-      expect(nativeToScVal(100, { type: 'u64' })).toEqual({ U64: 100n });
+      const r = nativeToScVal(100, { type: 'u64' });
+      expect(r._toModern()).toEqual({ U64: 100n });
     });
 
     it('i64', () => {
-      expect(nativeToScVal(-100, { type: 'i64' })).toEqual({ I64: -100n });
+      const r = nativeToScVal(-100, { type: 'i64' });
+      expect(r._toModern()).toEqual({ I64: -100n });
     });
 
     it('string', () => {
-      expect(nativeToScVal('hello', { type: 'string' })).toEqual({
-        String: 'hello',
-      });
+      const r = nativeToScVal('hello', { type: 'string' });
+      expect(r._toModern()).toEqual({ String: 'hello' });
     });
 
     it('symbol', () => {
-      expect(nativeToScVal('transfer', { type: 'symbol' })).toEqual({
-        Symbol: 'transfer',
-      });
+      const r = nativeToScVal('transfer', { type: 'symbol' });
+      expect(r._toModern()).toEqual({ Symbol: 'transfer' });
     });
 
     it('bytes from Uint8Array', () => {
       const bytes = new Uint8Array([1, 2, 3]);
-      expect(nativeToScVal(bytes, { type: 'bytes' })).toEqual({
-        Bytes: bytes,
-      });
+      const r = nativeToScVal(bytes, { type: 'bytes' });
+      expect(r._toModern()).toEqual({ Bytes: bytes });
     });
 
     it('address from string', () => {
       const result = nativeToScVal(PUBKEY, { type: 'address' });
-      expect('Address' in result).toBe(true);
+      expect(typeof result.switch).toBe('function');
+      const modern = result._toModern();
+      expect('Address' in modern).toBe(true);
     });
 
     it('address from Address object', () => {
       const addr = new Address(PUBKEY);
       const result = nativeToScVal(addr, { type: 'address' });
-      expect('Address' in result).toBe(true);
+      expect(typeof result.switch).toBe('function');
+      const modern = result._toModern();
+      expect('Address' in modern).toBe(true);
     });
   });
 
   describe('auto-detection', () => {
     it('boolean → Bool', () => {
-      expect(nativeToScVal(true)).toEqual({ Bool: true });
+      const r = nativeToScVal(true);
+      expect(r._toModern()).toEqual({ Bool: true });
     });
 
-    it('positive integer → U32', () => {
-      expect(nativeToScVal(42)).toEqual({ U32: 42 });
+    it('positive integer → U64', () => {
+      // Auto-detection now maps numbers to U64/I64 (not U32/I32)
+      const r = nativeToScVal(42);
+      expect(r._toModern()).toEqual({ U64: 42n });
     });
 
-    it('negative integer → I32', () => {
-      expect(nativeToScVal(-5)).toEqual({ I32: -5 });
+    it('negative integer → I64', () => {
+      const r = nativeToScVal(-5);
+      expect(r._toModern()).toEqual({ I64: -5n });
     });
 
-    it('small bigint → U32', () => {
-      expect(nativeToScVal(100n)).toEqual({ U32: 100 });
+    it('small bigint → U64', () => {
+      // Small bigints now go to U64 instead of U32
+      const r = nativeToScVal(100n);
+      expect(r._toModern()).toEqual({ U64: 100n });
     });
 
     it('large bigint → U64', () => {
-      expect(nativeToScVal(5000000000n)).toEqual({ U64: 5000000000n });
+      const r = nativeToScVal(5000000000n);
+      expect(r._toModern()).toEqual({ U64: 5000000000n });
     });
 
-    it('string → Symbol', () => {
-      expect(nativeToScVal('test')).toEqual({ Symbol: 'test' });
+    it('string → String', () => {
+      // Auto-detection for strings changed from Symbol to String
+      const r = nativeToScVal('test');
+      expect(r._toModern()).toEqual({ String: 'test' });
     });
 
     it('Uint8Array → Bytes', () => {
       const b = new Uint8Array([10, 20]);
-      expect(nativeToScVal(b)).toEqual({ Bytes: b });
+      const r = nativeToScVal(b);
+      expect(r._toModern()).toEqual({ Bytes: b });
     });
 
     it('null → Void', () => {
-      expect(nativeToScVal(null)).toBe('Void');
+      const r = nativeToScVal(null);
+      expect(r._toModern()).toBe('Void');
     });
 
     it('undefined → Void', () => {
-      expect(nativeToScVal(undefined)).toBe('Void');
+      const r = nativeToScVal(undefined);
+      expect(r._toModern()).toBe('Void');
     });
 
     it('array → Vec', () => {
       const result = nativeToScVal([1, 2, 3]);
-      expect('Vec' in result).toBe(true);
-      expect(result.Vec.length).toBe(3);
+      const modern = result._toModern();
+      expect('Vec' in modern).toBe(true);
+      expect(modern.Vec.length).toBe(3);
     });
 
     it('object → Map', () => {
       const result = nativeToScVal({ a: 1, b: true });
-      expect('Map' in result).toBe(true);
-      expect(result.Map.length).toBe(2);
+      const modern = result._toModern();
+      expect('Map' in modern).toBe(true);
+      expect(modern.Map.length).toBe(2);
     });
 
     it('Address → Address ScVal', () => {
       const addr = new Address(PUBKEY);
       const result = nativeToScVal(addr);
-      expect('Address' in result).toBe(true);
+      expect(typeof result.switch).toBe('function');
+      const modern = result._toModern();
+      expect('Address' in modern).toBe(true);
     });
 
     it('throws for non-integer number', () => {
@@ -179,11 +203,13 @@ describe('scValToNative', () => {
     expect(result).toEqual({ name: 'test', count: 42 });
   });
 
-  it('Address → Address object', () => {
+  it('Address → string', () => {
+    // Address.toScVal() now returns compat, scValToNative converts via _toModern()
     const scval = new Address(PUBKEY).toScVal();
     const result = scValToNative(scval);
-    expect(result).toBeInstanceOf(Address);
-    expect(result.toString()).toBe(PUBKEY);
+    // scValToNative for Address now returns the string address, not Address object
+    expect(typeof result).toBe('string');
+    expect(result).toBe(PUBKEY);
   });
 
   describe('roundtrip', () => {
@@ -192,7 +218,8 @@ describe('scValToNative', () => {
     });
 
     it('u32 roundtrips', () => {
-      expect(scValToNative(nativeToScVal(42))).toBe(42);
+      // Auto-detection now maps numbers to U64 → scValToNative returns bigint
+      expect(scValToNative(nativeToScVal(42))).toBe(42n);
     });
 
     it('string roundtrips', () => {
@@ -204,7 +231,8 @@ describe('scValToNative', () => {
     });
 
     it('array roundtrips', () => {
-      expect(scValToNative(nativeToScVal([1, 2, 3]))).toEqual([1, 2, 3]);
+      // Auto-detection maps numbers to U64 → roundtrip yields bigints
+      expect(scValToNative(nativeToScVal([1, 2, 3]))).toEqual([1n, 2n, 3n]);
     });
   });
 });

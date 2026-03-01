@@ -663,6 +663,7 @@ module Xdrgen
         @compat.puts "  optionConverter,"
         @compat.puts "  arrayConverter,"
         @compat.puts "  lazyConverter,"
+        @compat.puts "  opaqueStringConv,"
         @compat.puts "  type Converter,"
         @compat.puts "  Hyper,"
         @compat.puts "  UnsignedHyper,"
@@ -672,6 +673,7 @@ module Xdrgen
 
       def render_compat_helpers
         @compat.puts "const id = identity<any>();"
+        @compat.puts "const opaqueStr = opaqueStringConv();"
         @compat.puts "const int64Conv = hyperConverter();"
         @compat.puts "const uint64Conv = unsignedHyperConverter();"
         @compat.puts ""
@@ -1122,6 +1124,7 @@ module Xdrgen
       # Walks the typedef chain manually so Array/Optional wrappers are not lost.
       def resolve_named_converter(type)
         defn = type.respond_to?(:resolved_type) ? (type.resolved_type rescue nil) : nil
+        defn ||= type if type.is_a?(AST::Definitions::Base) && !type.is_a?(AST::Definitions::Typedef)
         return "id" unless defn
 
         # Walk the typedef chain, handling array/optional wrapper declarations

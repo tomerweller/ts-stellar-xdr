@@ -9,12 +9,15 @@ describe('Claimant', () => {
     it('creates with unconditional predicate by default', () => {
       const c = new Claimant(DEST);
       expect(c.destination).toBe(DEST);
-      expect(c.predicate).toBe('Unconditional');
+      // Predicate is now a compat ClaimPredicate object
+      expect(typeof c.predicate.switch).toBe('function');
+      expect(c.predicate.switch().name).toBe('claimPredicateUnconditional');
     });
 
     it('creates with explicit unconditional predicate', () => {
       const c = new Claimant(DEST, Claimant.predicateUnconditional());
-      expect(c.predicate).toBe('Unconditional');
+      expect(typeof c.predicate.switch).toBe('function');
+      expect(c.predicate.switch().name).toBe('claimPredicateUnconditional');
     });
 
     it('creates with explicit destination', () => {
@@ -25,37 +28,49 @@ describe('Claimant', () => {
 
   describe('predicate builders', () => {
     it('predicateUnconditional', () => {
-      expect(Claimant.predicateUnconditional()).toBe('Unconditional');
+      const pred = Claimant.predicateUnconditional();
+      expect(typeof pred.switch).toBe('function');
+      expect(pred.switch().name).toBe('claimPredicateUnconditional');
     });
 
     it('predicateBeforeAbsoluteTime', () => {
       const pred = Claimant.predicateBeforeAbsoluteTime('1234567890');
-      expect(pred).toEqual({ BeforeAbsoluteTime: 1234567890n });
+      expect(typeof pred.switch).toBe('function');
+      expect(pred._toModern()).toEqual({ BeforeAbsoluteTime: 1234567890n });
     });
 
     it('predicateBeforeRelativeTime', () => {
       const pred = Claimant.predicateBeforeRelativeTime('86400');
-      expect(pred).toEqual({ BeforeRelativeTime: 86400n });
+      expect(typeof pred.switch).toBe('function');
+      expect(pred._toModern()).toEqual({ BeforeRelativeTime: 86400n });
     });
 
     it('predicateAnd', () => {
       const p1 = Claimant.predicateBeforeAbsoluteTime('1000');
       const p2 = Claimant.predicateBeforeRelativeTime('500');
       const pred = Claimant.predicateAnd(p1, p2);
-      expect(pred).toEqual({ And: [p1, p2] });
+      expect(typeof pred.switch).toBe('function');
+      const modern = pred._toModern();
+      expect('And' in modern).toBe(true);
+      expect(modern.And.length).toBe(2);
     });
 
     it('predicateOr', () => {
       const p1 = Claimant.predicateUnconditional();
       const p2 = Claimant.predicateBeforeAbsoluteTime('2000');
       const pred = Claimant.predicateOr(p1, p2);
-      expect(pred).toEqual({ Or: [p1, p2] });
+      expect(typeof pred.switch).toBe('function');
+      const modern = pred._toModern();
+      expect('Or' in modern).toBe(true);
+      expect(modern.Or.length).toBe(2);
     });
 
     it('predicateNot', () => {
       const p = Claimant.predicateBeforeAbsoluteTime('3000');
       const pred = Claimant.predicateNot(p);
-      expect(pred).toEqual({ Not: p });
+      expect(typeof pred.switch).toBe('function');
+      const modern = pred._toModern();
+      expect('Not' in modern).toBe(true);
     });
 
     it('nested predicates', () => {
@@ -66,17 +81,12 @@ describe('Claimant', () => {
         ),
         Claimant.predicateNot(Claimant.predicateUnconditional()),
       );
-      expect(pred).toEqual({
-        And: [
-          {
-            Or: [
-              { BeforeAbsoluteTime: 1000n },
-              { BeforeRelativeTime: 500n },
-            ],
-          },
-          { Not: 'Unconditional' },
-        ],
-      });
+      expect(typeof pred.switch).toBe('function');
+      const modern = pred._toModern();
+      expect('And' in modern).toBe(true);
+      expect(modern.And.length).toBe(2);
+      expect('Or' in modern.And[0]).toBe(true);
+      expect('Not' in modern.And[1]).toBe(true);
     });
   });
 

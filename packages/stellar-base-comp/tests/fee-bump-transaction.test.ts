@@ -106,7 +106,8 @@ describe('FeeBumpTransaction', () => {
       );
       bump.sign(kp);
       expect(bump.signatures.length).toBe(1);
-      expect(bump.signatures[0].signature.length).toBe(64);
+      // Signatures are now compat DecoratedSignature with accessor methods
+      expect(bump.signatures[0].signature().length).toBe(64);
     });
 
     it('supports multiple signers', () => {
@@ -173,7 +174,10 @@ describe('FeeBumpTransaction', () => {
         Networks.TESTNET,
       );
       const env = bump.toEnvelope();
-      expect('TxFeeBump' in env).toBe(true);
+      // toEnvelope now returns a compat TransactionEnvelope
+      expect(typeof env.switch).toBe('function');
+      const modern = env._toModern();
+      expect('TxFeeBump' in modern).toBe(true);
     });
   });
 });

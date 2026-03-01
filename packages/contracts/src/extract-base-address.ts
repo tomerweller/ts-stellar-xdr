@@ -25,8 +25,8 @@ export function extractBaseAddress(address: string): string {
   }
 
   if (version === STRKEY_MUXED_ED25519) {
-    // Muxed payload = 8 bytes id + 32 bytes ed25519 key
-    const ed25519Key = payload.subarray(8, 40);
+    // Muxed payload = 32 bytes ed25519 key + 8 bytes id
+    const ed25519Key = payload.subarray(0, 32);
     return encodeStrkey(STRKEY_ED25519_PUBLIC, ed25519Key);
   }
 

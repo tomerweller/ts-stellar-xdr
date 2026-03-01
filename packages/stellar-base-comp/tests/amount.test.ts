@@ -21,14 +21,15 @@ describe('toStroops', () => {
 
 describe('fromStroops', () => {
   it('converts whole amounts', () => {
-    expect(fromStroops('1000000000')).toBe('100');
+    // fromStroops now always returns 7 decimal places to match js-stellar-base
+    expect(fromStroops('1000000000')).toBe('100.0000000');
   });
 
   it('converts fractional amounts', () => {
-    expect(fromStroops('1005000000')).toBe('100.5');
+    expect(fromStroops('1005000000')).toBe('100.5000000');
   });
 
-  it('strips trailing zeros', () => {
+  it('preserves all 7 decimals', () => {
     expect(fromStroops('1')).toBe('0.0000001');
   });
 });

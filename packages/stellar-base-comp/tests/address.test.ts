@@ -58,13 +58,18 @@ describe('Address', () => {
     it('converts account to ScAddress', () => {
       const addr = new Address(ACCOUNT);
       const sc = addr.toScAddress();
-      expect('Account' in sc).toBe(true);
+      // Returns compat object with switch() method
+      expect(typeof sc.switch).toBe('function');
+      const modern = sc._toModern();
+      expect('Account' in modern).toBe(true);
     });
 
     it('converts contract to ScAddress', () => {
       const addr = new Address(CONTRACT);
       const sc = addr.toScAddress();
-      expect('Contract' in sc).toBe(true);
+      expect(typeof sc.switch).toBe('function');
+      const modern = sc._toModern();
+      expect('Contract' in modern).toBe(true);
     });
 
     it('roundtrips account through ScAddress', () => {
@@ -86,13 +91,18 @@ describe('Address', () => {
     it('wraps account ScAddress in ScVal', () => {
       const addr = new Address(ACCOUNT);
       const scval = addr.toScVal();
-      expect('Address' in scval).toBe(true);
+      // Returns compat object with switch() method
+      expect(typeof scval.switch).toBe('function');
+      const modern = scval._toModern();
+      expect('Address' in modern).toBe(true);
     });
 
     it('wraps contract ScAddress in ScVal', () => {
       const addr = new Address(CONTRACT);
       const scval = addr.toScVal();
-      expect('Address' in scval).toBe(true);
+      expect(typeof scval.switch).toBe('function');
+      const modern = scval._toModern();
+      expect('Address' in modern).toBe(true);
     });
   });
 

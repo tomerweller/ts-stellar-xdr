@@ -36,21 +36,15 @@ export function toStroops(amount: string): string {
 
 /**
  * Convert a stroops string to decimal amount string.
- * "1005000000" → "100.5"
+ * Always returns 7 decimal places to match js-stellar-base.
+ * "1005000000" → "100.5000000"
+ * "10000000000" → "1000.0000000"
  */
 export function fromStroops(stroops: string): string {
   const bi = BigInt(stroops);
   const whole = bi / ONE;
   const frac = bi % ONE;
-
-  if (frac === 0n) {
-    return whole.toString();
-  }
-
-  // Format fraction, strip trailing zeros
-  let fracStr = frac.toString().padStart(7, '0');
-  fracStr = fracStr.replace(/0+$/, '');
-
+  const fracStr = frac.toString().padStart(7, '0');
   return `${whole}.${fracStr}`;
 }
 

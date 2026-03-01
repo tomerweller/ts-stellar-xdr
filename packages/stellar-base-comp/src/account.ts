@@ -10,6 +10,7 @@ import {
   STRKEY_MUXED_ED25519,
 } from '@stellar/strkey';
 import { StrKey } from './strkey.js';
+import { MuxedAccount as CompatMuxedAccount } from './generated/stellar_compat.js';
 
 export class Account {
   private readonly _accountId: string;
@@ -117,12 +118,13 @@ export class MuxedAccount {
 
   toXDRObject(): any {
     const rawKey = decodeStrkey(this._account.accountId()).payload;
-    return {
+    const modern = {
       MuxedEd25519: {
         id: BigInt(this._id),
         ed25519: rawKey,
       },
     };
+    return (CompatMuxedAccount as any)._fromModern(modern);
   }
 
   equals(other: MuxedAccount): boolean {
@@ -137,3 +139,18 @@ export class MuxedAccount {
     this._account.incrementSequenceNumber();
   }
 }
+
+// Override fromAddress with a regular function so it can be used with `new` (js-stellar-base compat)
+// Class static methods are not constructable in ES6, but the official SDK allows `new MuxedAccount.fromAddress(...)`.
+(MuxedAccount as any).fromAddress = function fromAddress(mAddress: string, sequenceNum: string): MuxedAccount {
+  const { version, payload } = decodeStrkey(mAddress);
+  if (version !== STRKEY_MUXED_ED25519) {
+    throw new Error('Expected M-address (muxed ed25519)');
+  }
+  const rawKey = payload.slice(0, 32);
+  const view = new DataView(payload.buffer, payload.byteOffset + 32, 8);
+  const id = view.getBigUint64(0, false);
+  const gAddress = encodeStrkey(STRKEY_ED25519_PUBLIC, rawKey);
+  const account = new Account(gAddress, sequenceNum);
+  return new MuxedAccount(account, id.toString());
+};

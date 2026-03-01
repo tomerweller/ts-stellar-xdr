@@ -8,9 +8,23 @@ export class Hyper {
   readonly low: number;
   readonly high: number;
 
-  constructor(low: number, high: number) {
-    this.low = low | 0;
-    this.high = high | 0;
+  constructor(low: number | bigint | string | [number, number], high?: number) {
+    if (Array.isArray(low)) {
+      this.low = low[0]! | 0;
+      this.high = low[1]! | 0;
+    } else if (typeof low === 'bigint') {
+      const h = Hyper.fromBigInt(low);
+      this.low = h.low;
+      this.high = h.high;
+    } else if (typeof low === 'string') {
+      const h = Hyper.fromBigInt(BigInt(low));
+      this.low = h.low;
+      this.high = h.high;
+    } else {
+      this.low = low | 0;
+      // Sign-extend when high is not provided (matches longs.js / js-xdr behavior)
+      this.high = high !== undefined ? (high | 0) : (low < 0 ? -1 : 0);
+    }
   }
 
   toBigInt(): bigint {
@@ -62,9 +76,22 @@ export class UnsignedHyper {
   readonly low: number;
   readonly high: number;
 
-  constructor(low: number, high: number) {
-    this.low = low | 0;
-    this.high = high | 0;
+  constructor(low: number | bigint | string | [number, number], high?: number) {
+    if (Array.isArray(low)) {
+      this.low = low[0]! | 0;
+      this.high = low[1]! | 0;
+    } else if (typeof low === 'bigint') {
+      const h = UnsignedHyper.fromBigInt(low);
+      this.low = h.low;
+      this.high = h.high;
+    } else if (typeof low === 'string') {
+      const h = UnsignedHyper.fromBigInt(BigInt(low));
+      this.low = h.low;
+      this.high = h.high;
+    } else {
+      this.low = low | 0;
+      this.high = (high ?? 0) | 0;
+    }
   }
 
   toBigInt(): bigint {

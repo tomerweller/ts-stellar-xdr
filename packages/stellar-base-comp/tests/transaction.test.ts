@@ -99,7 +99,8 @@ describe('Transaction', () => {
       const tx = buildTestTx();
       tx.sign(kp);
       expect(tx.signatures.length).toBe(1);
-      expect(tx.signatures[0].signature.length).toBe(64);
+      // Signatures are now compat DecoratedSignature with accessor methods
+      expect(tx.signatures[0].signature().length).toBe(64);
     });
 
     it('supports multiple signers', () => {
@@ -128,7 +129,8 @@ describe('Transaction', () => {
       const sigBase64 = btoa(String.fromCharCode(...sig));
       tx.addSignature(PUBKEY1, sigBase64);
       expect(tx.signatures.length).toBe(1);
-      expect(tx.signatures[0].hint.length).toBe(4);
+      // Signatures are now compat DecoratedSignature with accessor methods
+      expect(tx.signatures[0].hint().length).toBe(4);
     });
   });
 
@@ -136,7 +138,10 @@ describe('Transaction', () => {
     it('returns an envelope with Tx arm', () => {
       const tx = buildTestTx();
       const env = tx.toEnvelope();
-      expect('Tx' in env).toBe(true);
+      // toEnvelope now returns a compat TransactionEnvelope
+      expect(typeof env.switch).toBe('function');
+      const modern = env._toModern();
+      expect('Tx' in modern).toBe(true);
     });
 
     it('includes signatures in envelope', () => {
@@ -144,7 +149,8 @@ describe('Transaction', () => {
       const tx = buildTestTx();
       tx.sign(kp);
       const env = tx.toEnvelope();
-      expect(env.Tx!.signatures.length).toBe(1);
+      const modern = env._toModern();
+      expect(modern.Tx!.signatures.length).toBe(1);
     });
   });
 

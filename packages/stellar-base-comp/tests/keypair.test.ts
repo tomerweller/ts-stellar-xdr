@@ -194,21 +194,22 @@ describe('Keypair.sign and verify', () => {
 });
 
 describe('Keypair.signDecorated', () => {
-  it('returns hint and signature', () => {
+  it('returns hint and signature via accessor methods', () => {
     const kp = Keypair.fromSecret(SECRET1);
     const data = new Uint8Array([5, 6, 7, 8]);
     const dec = kp.signDecorated(data);
-    expect(dec.hint).toBeInstanceOf(Uint8Array);
-    expect(dec.hint.length).toBe(4);
-    expect(dec.signature).toBeInstanceOf(Uint8Array);
-    expect(dec.signature.length).toBe(64);
+    // signDecorated now returns a compat DecoratedSignature with accessor methods
+    expect(dec.hint()).toBeInstanceOf(Uint8Array);
+    expect(dec.hint().length).toBe(4);
+    expect(dec.signature()).toBeInstanceOf(Uint8Array);
+    expect(dec.signature().length).toBe(64);
   });
 
   it('hint matches signatureHint', () => {
     const kp = Keypair.fromSecret(SECRET1);
     const data = new Uint8Array([1, 2, 3]);
     const dec = kp.signDecorated(data);
-    expect(dec.hint).toEqual(kp.signatureHint());
+    expect(Array.from(dec.hint())).toEqual(Array.from(kp.signatureHint()));
   });
 
   it('hint matches last 4 bytes of public key', () => {
@@ -217,7 +218,7 @@ describe('Keypair.signDecorated', () => {
     const data = new Uint8Array([1, 2, 3, 4, 5, 6]);
     const dec = kp.signDecorated(data);
     const expectedHint = kp.rawPublicKey().slice(-4);
-    expect(Array.from(dec.hint)).toEqual(Array.from(expectedHint));
+    expect(Array.from(dec.hint())).toEqual(Array.from(expectedHint));
   });
 });
 

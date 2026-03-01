@@ -14,6 +14,8 @@ Modern TypeScript replacement for Stellar's official JS library stack. Zero runt
 | [`@stellar/rpc-client`](./packages/rpc-client/) | JSON-RPC client for Soroban RPC | `@stellar/xdr` |
 | [`@stellar/horizon-client`](./packages/horizon-client/) | REST client for Horizon API | `@stellar/xdr` |
 | [`@stellar/friendbot-client`](./packages/friendbot-client/) | Friendbot faucet client | none |
+| [`@stellar/seps`](./packages/seps/) | SEP-1 (stellar.toml), SEP-2 (federation), SEP-29 (memo-required) | `smol-toml` |
+| [`@stellar/contracts`](./packages/contracts/) | Contract utilities (ScInt, invocation trees, asset contract IDs) | `@stellar/xdr`, `@noble/hashes` |
 
 ### Compatibility Layers
 
@@ -21,15 +23,21 @@ Drop-in replacements that wrap the modern packages above to match the official J
 
 | Package | Description | Dependencies |
 |---|---|---|
-| [`@stellar/stellar-base-comp`](./packages/stellar-base-comp/) | Compatibility layer for `@stellar/stellar-base` | `@stellar/tx-builder`, `@noble/hashes` |
+| [`@stellar/stellar-base-comp`](./packages/stellar-base-comp/) | Compatibility layer for `@stellar/stellar-base` (99.5% parity) | `@stellar/tx-builder`, `@stellar/contracts`, `@noble/hashes` |
 | [`@stellar/stellar-sdk-comp`](./packages/stellar-sdk-comp/) | Compatibility layer for `@stellar/stellar-sdk` | `stellar-base-comp`, `@stellar/rpc-client` |
+
+### Testing
+
+| Package | Description |
+|---|---|
+| [`@stellar/parity-tests`](./packages/parity-tests/) | Runs official js-stellar-base test suite against the compat layer (563/566 passing) |
 
 ## Quick Start
 
 ```bash
 npm install        # install deps + workspace symlinks
 npm run build      # build all packages in dependency order
-npm test           # run all tests
+npm test           # run all 1332 tests
 ```
 
 Requires Node.js >= 18.
@@ -119,12 +127,17 @@ This project replaces the following packages from Stellar's official JS stack:
 
 ```
 packages/
-  strkey/           # standalone address encoding, zero deps
-  xdr/              # XDR codecs, generated Stellar types, code generator
-  tx-builder/       # transactions, operations, keypairs, signing
-  rpc-client/       # Soroban RPC JSON-RPC client
-  horizon-client/   # Horizon REST API client
-  friendbot-client/ # Friendbot faucet client
+  strkey/             # standalone address encoding, zero deps
+  xdr/                # XDR codecs, generated Stellar types, code generator
+  tx-builder/         # transactions, operations, keypairs, signing
+  rpc-client/         # Soroban RPC JSON-RPC client
+  horizon-client/     # Horizon REST API client
+  friendbot-client/   # Friendbot faucet client
+  seps/               # SEP implementations (stellar.toml, federation, memo-required)
+  contracts/          # contract utilities (ScInt, invocation trees, asset contract IDs)
+  stellar-base-comp/  # compatibility layer for @stellar/stellar-base
+  stellar-sdk-comp/   # compatibility layer for @stellar/stellar-sdk
+  parity-tests/       # official test suite validation (js-stellar-base)
 ```
 
 See each package's README for detailed API documentation.

@@ -2,6 +2,16 @@
 
 Drop-in compatibility layer that provides the `@stellar/stellar-base` API surface on top of the modern `@stellar/xdr` and `@stellar/tx-builder` packages. Existing code using `stellar-base` can migrate with minimal changes.
 
+## Parity Status
+
+Validated against the official [`@stellar/stellar-base`](https://github.com/stellar/js-stellar-base) test suite (33 files, 566 tests):
+
+| Tests passing | Tests failing | Pass rate |
+|---------------|---------------|-----------|
+| 563 | 3 (internal utilities) | 99.5% |
+
+The 3 remaining failures are internal SDK utility tests (`best_r`, `BigNumber.DEBUG`) not part of the public API. See [`@stellar/parity-tests`](../parity-tests/) for details.
+
 ## Installation
 
 ```bash
@@ -204,6 +214,7 @@ tb.toXDR('base64');
 - `@stellar/strkey` — Address encoding
 - `@stellar/xdr` — XDR codecs + generated types
 - `@stellar/tx-builder` — Modern transaction/operation/keypair implementations
+- `@stellar/contracts` — Contract utilities (ScInt, XdrLargeInt, invocation trees)
 - `@noble/ed25519` — Ed25519 cryptography
 - `@noble/hashes` — Sync SHA-256/SHA-512 for synchronous crypto operations
 

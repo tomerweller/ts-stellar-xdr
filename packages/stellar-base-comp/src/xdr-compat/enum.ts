@@ -75,7 +75,8 @@ export function createCompatEnum(config: CompatEnumConfig): CompatEnumClass {
     singletons.set(m.compat, instance);
 
     // Static factory: CompatEnum.assetTypeNative() → singleton
-    (CompatEnum as any)[m.compat] = () => instance;
+    // Use regular function so it can be called with `new` (js-xdr compat)
+    (CompatEnum as any)[m.compat] = function() { return instance; };
   }
 
   return CompatEnum as any;

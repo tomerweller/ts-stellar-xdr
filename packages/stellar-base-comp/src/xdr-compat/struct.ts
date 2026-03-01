@@ -9,7 +9,7 @@
  */
 
 import type { XdrCodec } from '@stellar/xdr';
-import { XdrTypeBase } from './base.js';
+import { XdrTypeBase, augmentIfBuffer } from './base.js';
 import type { Converter } from './converters.js';
 
 export interface StructFieldConfig {
@@ -61,7 +61,7 @@ export function createCompatStruct(config: CompatStructConfig): CompatStructClas
       const attrs: Record<string, any> = {};
       for (const field of fields) {
         const mName = field.modernName ?? field.name;
-        attrs[field.name] = field.convert.toCompat(modern[mName]);
+        attrs[field.name] = augmentIfBuffer(field.convert.toCompat(modern[mName]));
       }
       return new CompatStruct(attrs);
     }
@@ -81,6 +81,20 @@ export function createCompatStruct(config: CompatStructConfig): CompatStructClas
       configurable: true,
     });
   }
+
+  // Add static isValid method (validates by attempting round-trip XDR encode/decode)
+  (CompatStruct as any).isValid = function(value: any): boolean {
+    try {
+      if (value && typeof value.toXDR === 'function') {
+        const xdrBytes = value.toXDR('raw');
+        (CompatStruct as any).fromXDR(xdrBytes, 'raw');
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
 
   return CompatStruct as any;
 }

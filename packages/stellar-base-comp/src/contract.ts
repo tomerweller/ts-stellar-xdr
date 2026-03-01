@@ -7,6 +7,12 @@ import {
   encodeStrkey,
   STRKEY_CONTRACT,
 } from '@stellar/xdr';
+import {
+  ScVal as CompatScVal,
+  ScAddress as CompatScAddress,
+  LedgerKey as CompatLedgerKey,
+  Operation as CompatOperation,
+} from './generated/stellar_compat.js';
 
 export class Contract {
   private readonly _id: Uint8Array;
@@ -29,23 +35,35 @@ export class Contract {
   }
 
   call(method: string, ...args: any[]): any {
-    return {
-      Vec: [
-        { Address: { Contract: this._id } },
-        { Symbol: method },
-        ...args,
-      ],
+    // Build a full compat xdr.Operation with InvokeHostFunction body,
+    // matching js-stellar-base's Contract.call() API.
+    const modernOp = {
+      sourceAccount: null,
+      body: {
+        InvokeHostFunction: {
+          hostFunction: {
+            InvokeContract: {
+              contractAddress: { Contract: this._id },
+              functionName: method,
+              args: args.map((a: any) => typeof a?._toModern === 'function' ? a._toModern() : a),
+            },
+          },
+          auth: [],
+        },
+      },
     };
+    return (CompatOperation as any)._fromModern(modernOp);
   }
 
   getFootprint(): any {
-    return {
+    const modern = {
       ContractData: {
         contract: { Contract: this._id },
         key: 'LedgerKeyContractInstance',
         durability: 'Persistent',
       },
     };
+    return (CompatLedgerKey as any)._fromModern(modern);
   }
 }
 

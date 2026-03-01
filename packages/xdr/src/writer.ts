@@ -129,7 +129,12 @@ export class XdrWriter {
   }
 
   writeString(value: string, maxLength?: number): void {
-    const bytes = textEncoder.encode(value);
+    // Use latin1-style encoding to preserve all byte values for round-trip fidelity.
+    // Stellar XDR strings may contain non-UTF-8 bytes (e.g., in memo text fields).
+    const bytes = new Uint8Array(value.length);
+    for (let i = 0; i < value.length; i++) {
+      bytes[i] = value.charCodeAt(i) & 0xFF;
+    }
     if (maxLength !== undefined && bytes.length > maxLength) {
       throw new XdrError(
         XdrErrorCode.LengthExceedsMax,

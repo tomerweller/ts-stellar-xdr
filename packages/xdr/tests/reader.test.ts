@@ -155,15 +155,22 @@ describe('XdrReader', () => {
       expect(r.readString()).toBe('Hi');
     });
 
-    it('reads UTF-8 string', () => {
-      // "é" = 0xC3 0xA9 in UTF-8
+    it('reads bytes as latin1 for round-trip fidelity', () => {
+      // Reader now uses latin1-style decoding to preserve byte values
+      // 0xC3 0xA9 (UTF-8 for "é") becomes two latin1 characters
       const r = new XdrReader(bytes(0, 0, 0, 2, 0xc3, 0xa9, 0, 0));
-      expect(r.readString()).toBe('é');
+      const result = r.readString();
+      expect(result.length).toBe(2);
+      expect(result.charCodeAt(0)).toBe(0xc3);
+      expect(result.charCodeAt(1)).toBe(0xa9);
     });
 
-    it('rejects invalid UTF-8', () => {
+    it('accepts all byte values (no UTF-8 rejection)', () => {
+      // Latin1 decoder does not reject any byte values
       const r = new XdrReader(bytes(0, 0, 0, 1, 0xff, 0, 0, 0));
-      expect(() => r.readString()).toThrow(XdrErrorCode.Utf8Error);
+      const result = r.readString();
+      expect(result.length).toBe(1);
+      expect(result.charCodeAt(0)).toBe(0xff);
     });
   });
 

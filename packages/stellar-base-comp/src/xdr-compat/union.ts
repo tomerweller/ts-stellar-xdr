@@ -10,7 +10,7 @@
  */
 
 import type { XdrCodec } from '@stellar/xdr';
-import { XdrTypeBase } from './base.js';
+import { XdrTypeBase, augmentIfBuffer } from './base.js';
 import type { Converter } from './converters.js';
 
 export interface UnionArmConfig {
@@ -71,9 +71,25 @@ export function createCompatUnion(config: CompatUnionConfig): CompatUnionClass {
 
     constructor(switchVal: any, armName: string | undefined, armValue: any) {
       super();
-      this._switch = switchVal;
-      this._armName = armName;
-      this._armValue = armValue;
+      // Detect 2-arg form: new Union('switchName', value?) or new Union(intDiscriminant, value?)
+      // In js-xdr, the constructor is (switchName, value) where switchName is a string enum name.
+      // For integer-discriminated unions, it can also be (intValue, value).
+      // Our internal 3-arg form is (switchVal, armName, armValue) where armName is looked up.
+      // Distinguish: if armName is not a string or is not a known arm name, treat as 2-arg form.
+      const is2Arg = arguments.length <= 2 && switchToArm.has(switchVal) &&
+        (typeof switchVal === 'string' || typeof switchVal === 'number');
+      if (is2Arg) {
+        // 2-arg form: switchVal is switch name/value, armName is actually the value
+        const armConfig = switchToArm.get(switchVal)!;
+        const sv = isIntDiscriminant ? switchVal : (switchEnum as any)[switchVal]();
+        this._switch = sv;
+        this._armName = armConfig.arm;
+        this._armValue = armConfig.arm ? armName : undefined; // armName is actually the value in 2-arg form
+      } else {
+        this._switch = switchVal;
+        this._armName = armName;
+        this._armValue = armValue;
+      }
     }
 
     switch(): any {
@@ -97,20 +113,26 @@ export function createCompatUnion(config: CompatUnionConfig): CompatUnionClass {
         throw new Error(`Unknown switch value: ${switchKey}`);
       }
       if (!armConfig.arm) {
-        // Void arm — return string literal or number
-        return armConfig.modern;
+        // Void arm — return string literal (modern uses stringified numbers for int-discriminated)
+        return isIntDiscriminant ? String(armConfig.modern) : armConfig.modern;
       }
       // Value arm — return { ModernKey: convertedValue }
+      const modernKey = isIntDiscriminant ? String(armConfig.modern) : armConfig.modern;
       const modernValue = armConfig.convert
         ? armConfig.convert.toModern(this._armValue)
         : this._armValue;
-      return { [armConfig.modern]: modernValue };
+      return { [modernKey]: modernValue };
     }
 
     static _fromModern(modern: any): CompatUnion {
       if (typeof modern === 'string' || typeof modern === 'number') {
         // Void arm (string for enum, number for int discriminant)
-        const armConfig = modernToArm.get(modern);
+        let armConfig = modernToArm.get(modern);
+        // If string didn't match, try as number (e.g. '0' → 0 for int-discriminated unions)
+        if (!armConfig && typeof modern === 'string') {
+          const numKey = Number(modern);
+          if (!isNaN(numKey)) armConfig = modernToArm.get(numKey);
+        }
         if (!armConfig) {
           throw new Error(`Unknown modern union key: ${modern}`);
         }
@@ -132,22 +154,44 @@ export function createCompatUnion(config: CompatUnionConfig): CompatUnionClass {
       }
       const sv = armConfig.switchValues[0]!;
       const switchVal = isIntDiscriminant ? sv : (switchEnum as any)[sv]();
-      const compatValue = armConfig.convert
+      const rawCompat = armConfig.convert
         ? armConfig.convert.toCompat(modernValue)
         : modernValue;
+      const compatValue = augmentIfBuffer(rawCompat);
       return new CompatUnion(switchVal, armConfig.arm, compatValue);
     }
   }
 
   // Add static factory methods for each switch value
+  // Use regular functions (not arrows) so they can be called with `new` (js-xdr compat)
   for (const arm of arms) {
     for (const sv of arm.switchValues) {
-      (CompatUnion as any)[sv] = (value?: any) => {
+      (CompatUnion as any)[sv] = function(value?: any) {
         const switchVal = isIntDiscriminant ? sv : (switchEnum as any)[sv]();
         if (!arm.arm) {
           return new CompatUnion(switchVal, undefined, undefined);
         }
-        return new CompatUnion(switchVal, arm.arm, value);
+        // If the value is a native BigInt and the arm has a converter,
+        // wrap it using the converter (e.g., BigInt → Hyper/UnsignedHyper).
+        // This ensures compat objects don't contain raw BigInts.
+        let armValue = value;
+        if (typeof value === 'bigint' && arm.convert) {
+          try {
+            armValue = arm.convert.toCompat(value);
+          } catch {
+            // If conversion fails, keep the original value
+          }
+        }
+        // Convert Uint8Array to string for string/symbol arms (matches js-xdr behavior
+        // where string types accept both Buffer and string inputs).
+        if (armValue instanceof Uint8Array && (arm.arm === 'str' || arm.arm === 'sym')) {
+          let result = '';
+          for (let i = 0; i < armValue.length; i++) {
+            result += String.fromCharCode(armValue[i]!);
+          }
+          armValue = result;
+        }
+        return new CompatUnion(switchVal, arm.arm, armValue);
       };
     }
   }
@@ -174,6 +218,20 @@ export function createCompatUnion(config: CompatUnionConfig): CompatUnionClass {
       });
     }
   }
+
+  // Add static isValid method (validates by attempting round-trip XDR encode/decode)
+  (CompatUnion as any).isValid = function(value: any): boolean {
+    try {
+      if (value && typeof value.toXDR === 'function') {
+        const xdrBytes = value.toXDR('raw');
+        (CompatUnion as any).fromXDR(xdrBytes, 'raw');
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
 
   return CompatUnion as any;
 }

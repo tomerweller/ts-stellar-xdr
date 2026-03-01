@@ -1,7 +1,18 @@
 import { XdrError, XdrErrorCode } from './errors.js';
 import { type Limits, DEFAULT_LIMITS, LimitTracker } from './limits.js';
 
-const textDecoder = new TextDecoder('utf-8', { fatal: true });
+// Use a latin1-style decoder that preserves all byte values for round-trip fidelity.
+// Stellar XDR strings may contain non-UTF-8 bytes (e.g., in memo text fields).
+// Using UTF-8 decoding would replace invalid bytes with U+FFFD, breaking hashes.
+function decodeLatin1(bytes: Uint8Array): string {
+  // Build string one character at a time from byte values.
+  // This preserves all byte values 0x00-0xFF as their corresponding code points.
+  let result = '';
+  for (let i = 0; i < bytes.length; i++) {
+    result += String.fromCharCode(bytes[i]!);
+  }
+  return result;
+}
 
 export class XdrReader {
   private readonly data: Uint8Array;
@@ -108,11 +119,7 @@ export class XdrReader {
 
   readString(maxLength?: number): string {
     const bytes = this.readVarOpaque(maxLength);
-    try {
-      return textDecoder.decode(bytes);
-    } catch {
-      throw new XdrError(XdrErrorCode.Utf8Error, 'Invalid UTF-8 in string');
-    }
+    return decodeLatin1(bytes);
   }
 
   readPadding(n: number): void {

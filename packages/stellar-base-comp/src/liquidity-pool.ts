@@ -4,77 +4,57 @@
 
 import { LiquidityPoolParameters } from '@stellar/xdr';
 import { hash } from './signing.js';
-import type { Asset } from './asset.js';
-
-const LIQUIDITY_POOL_FEE = 30;
-
-/** Numeric rank for asset type ordering (matches XDR discriminant order) */
-const TYPE_RANK: Record<string, number> = {
-  native: 0,
-  credit_alphanum4: 1,
-  credit_alphanum12: 2,
-};
-
-/** Compare assets for lexicographic ordering */
-function compareAssets(a: Asset, b: Asset): number {
-  const typeA = a.getAssetType();
-  const typeB = b.getAssetType();
-  const rankA = TYPE_RANK[typeA] ?? 99;
-  const rankB = TYPE_RANK[typeB] ?? 99;
-  if (rankA !== rankB) return rankA - rankB;
-  if (typeA === 'native') return 0; // both native = equal
-  const codeA = a.getCode();
-  const codeB = b.getCode();
-  if (codeA !== codeB) return codeA < codeB ? -1 : 1;
-  const issuerA = a.getIssuer() ?? '';
-  const issuerB = b.getIssuer() ?? '';
-  if (issuerA !== issuerB) return issuerA < issuerB ? -1 : 1;
-  return 0;
-}
+import { Asset } from './asset.js';
 
 /**
  * Compute a liquidity pool ID.
- * Supports both the official SDK signature `(type, { assetA, assetB, fee })`
- * and the simplified `(assetA, assetB, fee?)` form.
- * Returns a 64-character hex string.
+ * Signature: getLiquidityPoolId("constant_product", { assetA, assetB, fee })
+ * Returns a Buffer-like Uint8Array with .toString('hex').
  */
 export function getLiquidityPoolId(
-  typeOrAssetA: string | Asset,
-  parametersOrAssetB?: any,
-  fee?: number,
+  liquidityPoolType?: any,
+  parameters?: any,
 ): any {
-  let assetA: Asset;
-  let assetB: Asset;
-  let poolFee: number;
-
-  if (typeof typeOrAssetA === 'string') {
-    // Official SDK signature: getLiquidityPoolId("constant_product", { assetA, assetB, fee })
-    const params = parametersOrAssetB as { assetA: Asset; assetB: Asset; fee: number };
-    assetA = params.assetA;
-    assetB = params.assetB;
-    poolFee = params.fee ?? LIQUIDITY_POOL_FEE;
-  } else {
-    // Simplified: getLiquidityPoolId(assetA, assetB, fee?)
-    assetA = typeOrAssetA;
-    assetB = parametersOrAssetB as Asset;
-    poolFee = fee ?? LIQUIDITY_POOL_FEE;
+  // Validate pool type
+  if (liquidityPoolType !== 'constant_product') {
+    throw new Error('liquidityPoolType is invalid');
   }
 
-  // Validate: assetA must be strictly less than assetB in lexicographic order
-  const cmp = compareAssets(assetA, assetB);
+  const params = parameters || {};
+
+  // Validate assetA
+  if (!(params.assetA instanceof Asset)) {
+    throw new Error('assetA is invalid');
+  }
+
+  // Validate assetB
+  if (!(params.assetB instanceof Asset)) {
+    throw new Error('assetB is invalid');
+  }
+
+  // Validate fee
+  if (typeof params.fee !== 'number') {
+    throw new Error('fee is invalid');
+  }
+
+  const assetA: Asset = params.assetA;
+  const assetB: Asset = params.assetB;
+  const fee: number = params.fee;
+
+  // Validate lexicographic ordering
+  const cmp = Asset.compare(assetA, assetB);
   if (cmp >= 0) {
     throw new Error('Assets are not in lexicographic order');
   }
 
-  const params = {
+  const modernParams = {
     LiquidityPoolConstantProduct: {
-      assetA: assetA._toModern(),
-      assetB: assetB._toModern(),
-      fee: poolFee,
+      assetA: (assetA as any)._toModern(),
+      assetB: (assetB as any)._toModern(),
+      fee,
     },
   };
 
-  const bytes = LiquidityPoolParameters.toXdr(params);
-  const poolHash = hash(bytes);
-  return poolHash.toString('hex');
+  const bytes = LiquidityPoolParameters.toXdr(modernParams);
+  return hash(bytes);
 }

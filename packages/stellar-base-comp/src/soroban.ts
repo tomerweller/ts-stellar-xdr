@@ -10,6 +10,10 @@ export const Soroban = {
    * @returns Formatted amount (e.g., "1.0000000")
    */
   formatTokenAmount(amount: string, decimals: number): string {
+    if (amount.includes('.')) {
+      throw new Error('No decimals are allowed');
+    }
+
     if (decimals === 0) return amount;
 
     const negative = amount.startsWith('-');
@@ -21,7 +25,10 @@ export const Soroban = {
     }
 
     const intPart = abs.slice(0, abs.length - decimals);
-    const fracPart = abs.slice(abs.length - decimals);
+    let fracPart = abs.slice(abs.length - decimals);
+
+    // Trim trailing zeros but keep at least one decimal digit
+    fracPart = fracPart.replace(/0+$/, '') || '0';
 
     return (negative ? '-' : '') + intPart + '.' + fracPart;
   },
@@ -37,6 +44,9 @@ export const Soroban = {
     let abs = negative ? value.slice(1) : value;
 
     const parts = abs.split('.');
+    if (parts.length > 2) {
+      throw new Error('Invalid decimal value');
+    }
     const intPart = parts[0] ?? '0';
     let fracPart = parts[1] ?? '';
 

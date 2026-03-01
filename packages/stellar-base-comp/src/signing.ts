@@ -14,7 +14,17 @@ if (!etc.sha512Sync) {
 
 const encoder = new TextEncoder();
 
-/** Augment a Uint8Array with Buffer-like toString(encoding) */
+/** Coerce input to Uint8Array (handles strings, Buffers, arrays) */
+function coerce(data: any): Uint8Array {
+  if (typeof data === 'string') return encoder.encode(data);
+  if (data instanceof Uint8Array) {
+    return data.constructor === Uint8Array ? data : new Uint8Array(data);
+  }
+  if (Array.isArray(data)) return new Uint8Array(data);
+  return data;
+}
+
+/** Augment a Uint8Array with Buffer-like toString(encoding), equals(), and slice() */
 function augmentBuffer(buf: Uint8Array): any {
   const origToString = buf.toString.bind(buf);
   Object.defineProperty(buf, 'toString', {
@@ -25,7 +35,8 @@ function augmentBuffer(buf: Uint8Array): any {
       if (encoding === 'hex') {
         return Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
       }
-      if (encoding === 'utf8' || encoding === 'utf-8') {
+      if (encoding === 'utf8' || encoding === 'utf-8' || encoding === 'ascii' || !encoding) {
+        // Default to UTF-8 like Buffer.toString()
         return new TextDecoder().decode(buf);
       }
       return origToString();
@@ -34,12 +45,35 @@ function augmentBuffer(buf: Uint8Array): any {
     enumerable: false,
     configurable: true,
   });
+  // Add .equals() method for Buffer compatibility
+  if (!(buf as any).equals) {
+    Object.defineProperty(buf, 'equals', {
+      value: (other: Uint8Array) => {
+        if (buf.length !== other.length) return false;
+        for (let i = 0; i < buf.length; i++) {
+          if (buf[i] !== other[i]) return false;
+        }
+        return true;
+      },
+      writable: true,
+      enumerable: false,
+      configurable: true,
+    });
+  }
+  // Override slice to return augmented buffers (like Buffer.slice())
+  const origSlice = buf.slice.bind(buf);
+  Object.defineProperty(buf, 'slice', {
+    value: (...args: any[]) => augmentBuffer(origSlice(...args)),
+    writable: true,
+    enumerable: false,
+    configurable: true,
+  });
   return buf;
 }
 
 /** Sync SHA-256 hash */
-export function hash(data: Uint8Array): any {
-  return augmentBuffer(nobleSha256(data));
+export function hash(data: any): any {
+  return augmentBuffer(nobleSha256(coerce(data)));
 }
 
 /** Compute network ID (SHA-256 of passphrase) */
@@ -62,13 +96,13 @@ function augmentBuffersDeep(obj: any): any {
 }
 
 /** Ed25519 sign (sync) — returns signature bytes */
-export function sign(data: Uint8Array, rawSecret: Uint8Array): any {
-  return augmentBuffer(ed25519Sign(data, rawSecret));
+export function sign(data: any, rawSecret: Uint8Array): any {
+  return augmentBuffer(ed25519Sign(coerce(data), coerce(rawSecret)));
 }
 
 /** Ed25519 verify (sync) */
-export function verify(data: Uint8Array, signature: Uint8Array, rawPublicKey: Uint8Array): boolean {
-  return ed25519Verify(signature, data, rawPublicKey);
+export function verify(data: any, signature: any, rawPublicKey: any): boolean {
+  return ed25519Verify(coerce(signature), coerce(data), coerce(rawPublicKey));
 }
 
 export { augmentBuffer, augmentBuffersDeep };

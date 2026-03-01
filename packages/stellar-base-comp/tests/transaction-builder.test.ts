@@ -86,14 +86,16 @@ describe('TransactionBuilder', () => {
       expect(tx.fee).toBe('500');
     });
 
-    it('requires at least one operation', () => {
+    it('builds with zero operations (allowed for parity with js-stellar-base)', () => {
       const account = new Account(PUBKEY1, '500');
       const builder = new TransactionBuilder(account, {
         fee: BASE_FEE,
         networkPassphrase: Networks.TESTNET,
       });
       builder.setTimeout(30);
-      expect(() => builder.build()).toThrow('at least one operation');
+      // js-stellar-base allows building with zero operations
+      const tx = builder.build();
+      expect(tx.operations.length).toBe(0);
     });
 
     it('requires timeout or timebounds', () => {
